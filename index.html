@@ -129,8 +129,21 @@
       background: rgba(0,0,0,.15);
     }
     .team{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-    .team .name{ font-weight:700; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .team .name{
+      font-weight:800;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
     .team .hint{ font-size:12px; color:var(--muted); }
+    .team .name a{
+      color:var(--text);
+      text-decoration:none;
+      border-bottom:1px dashed rgba(255,255,255,.25);
+      padding-bottom:1px;
+    }
+    .team .name a:hover{ filter:brightness(1.12); }
 
     .scorebox{
       display:flex;
@@ -174,6 +187,16 @@
     tr:last-child td{ border-bottom:none; }
     .teamcell{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; }
     .dot{ width:10px;height:10px;border-radius:50%; background: rgba(255,255,255,.30); border:1px solid var(--line); flex:0 0 auto; }
+
+    .teamlink{
+      color:var(--text);
+      text-decoration:none;
+      border-bottom:1px dashed rgba(255,255,255,.25);
+      padding-bottom:1px;
+      cursor:pointer;
+    }
+    .teamlink:hover{ filter:brightness(1.12); }
+
     .legend{
       margin-top:10px;
       color:var(--muted);
@@ -215,6 +238,66 @@
     @media (max-width: 700px){
       .player-frame iframe{ height:320px; }
     }
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:9999;
+    }
+    .modal{
+      width:min(680px, 100%);
+      background: rgba(18,26,51,.95);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+    }
+    .modal-header strong{ font-size:15px; }
+    .modal-close{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .modal-body{
+      padding:14px 16px 16px;
+    }
+    .players{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      gap:8px;
+    }
+    .players li{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.12);
+      font-weight:700;
+    }
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
   </style>
 </head>
 
@@ -223,10 +306,10 @@
     <div class="title">
       <div>
         <h1>Intra Royal Cup <span class="pill">Viewer</span></h1>
-        <p class="subtitle">Scores are updated by Admin. This page is view-only.</p>
+        <p class="subtitle">Scores and Live video are updated by Admin. Click a team to see players.</p>
       </div>
       <div class="controls">
-        <button id="refreshBtn" type="button">Refresh Scores</button>
+        <button id="refreshBtn" type="button">Refresh</button>
         <a class="btn" href="admin.html" title="Open Admin page">Admin</a>
       </div>
     </div>
@@ -241,7 +324,7 @@
       </h2>
       <div class="schedule" id="schedule"></div>
       <div class="note" style="margin:0 16px 16px;">
-        If you don’t see updates, click <strong>Refresh Scores</strong>.
+        If you don’t see updates, click <strong>Refresh</strong>.
       </div>
     </section>
 
@@ -286,15 +369,20 @@
       </h2>
       <div class="player">
         <div class="player-frame">
-          <!-- Replace YOUR_PAGE_NAME and YOUR_VIDEO_ID -->
           <iframe
-            src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/YOUR_PAGE_NAME/videos/YOUR_VIDEO_ID/&autoplay=1&mute=1&show_text=0"
+            id="fbPlayer"
+            src=""
             scrolling="no"
             frameborder="0"
             allowfullscreen="true"
             allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
           </iframe>
         </div>
+
+        <div id="noLiveMsg" class="note" style="margin-top:12px; display:none;">
+          No live video set yet. Admin must paste the Facebook Live link in admin page.
+        </div>
+
         <div class="note" style="margin-top:12px;">
           Autoplay works only when muted (browser restriction).
         </div>
@@ -302,10 +390,26 @@
     </section>
   </div>
 
-  <script>
-    // ===== Shared data (same in admin.html) =====
-    const STORAGE_KEY = "royalCupScores_v1";
+  <!-- Team modal -->
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <strong id="modalTitle">Team</strong>
+        <button class="modal-close" id="modalClose" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalContent"></div>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    // ===== Shared storage keys =====
+    const STORAGE_KEY = "royalCupScores_v1";
+    const LIVE_URL_KEY = "royalCupLiveUrl_v1";
+    const PLAYERS_KEY = "royalCupPlayers_v1";
+
+    // Teams
     const A = "Arbin(Ma-Kalu)";
     const R = "Rooster(Eagle Eye)";
     const M = "Mama(Mama-Vanja)";
@@ -313,6 +417,7 @@
 
     const TEAMS = [A, R, M, G];
 
+    // Match list (Match 1..6)
     const MATCHES = [
       { id: "g1", title: "Match 1", home: A, away: R },
       { id: "g2", title: "Match 2", home: M, away: G },
@@ -326,15 +431,29 @@
     const tableBodyEl = document.getElementById("tableBody");
     const refreshBtn = document.getElementById("refreshBtn");
 
-    function loadScores(){
+    // Modal elements
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalClose = document.getElementById("modalClose");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+
+    function safeParseJSON(raw, fallback){
       try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return {};
-        const obj = JSON.parse(raw);
-        return (obj && typeof obj === "object") ? obj : {};
-      }catch(e){
-        return {};
+        const v = JSON.parse(raw);
+        return (v && typeof v === "object") ? v : fallback;
+      }catch{
+        return fallback;
       }
+    }
+
+    function loadScores(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? safeParseJSON(raw, {}) : {};
+    }
+
+    function loadPlayers(){
+      const raw = localStorage.getItem(PLAYERS_KEY);
+      return raw ? safeParseJSON(raw, {}) : {};
     }
 
     function emptyStats(){
@@ -379,6 +498,20 @@
       return stats;
     }
 
+    function makeTeamLink(team){
+      // Use a link-style span so it can be clicked anywhere
+      return `<a class="teamlink" href="#" data-team="${escapeHtml(team)}">${escapeHtml(team)}</a>`;
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
     function renderTable(stats){
       const order = [...TEAMS].sort((x,y)=>{
         const A = stats[x], B = stats[y];
@@ -393,7 +526,7 @@
           <td>
             <div class="teamcell">
               <span class="dot"></span>
-              <span>${team}</span>
+              ${makeTeamLink(team)}
             </div>
           </td>
           <td>${s.P}</td>
@@ -420,13 +553,13 @@
         wrap.className = "matchday";
         wrap.innerHTML = `
           <div class="matchday-title">
-            <strong>${g.title}</strong>
+            <strong>${escapeHtml(g.title)}</strong>
             <span class="pill">${hs === "" || as === "" ? "Not played" : "Played"}</span>
           </div>
 
           <div class="game">
             <div class="team">
-              <div class="name">${g.home}</div>
+              <div class="name">${makeTeamLink(g.home)}</div>
               <div class="hint">Home</div>
             </div>
 
@@ -437,7 +570,7 @@
             </div>
 
             <div class="team" style="text-align:right">
-              <div class="name">${g.away}</div>
+              <div class="name">${makeTeamLink(g.away)}</div>
               <div class="hint">Away</div>
             </div>
           </div>
@@ -446,16 +579,91 @@
       }
     }
 
+    // ===== Live URL handling =====
+    function loadLiveUrl(){
+      return localStorage.getItem(LIVE_URL_KEY) || "";
+    }
+
+    function buildFacebookEmbedSrc(fbUrl){
+      const href = encodeURIComponent(fbUrl.trim());
+      return `https://www.facebook.com/plugins/video.php?href=${href}&autoplay=1&mute=1&show_text=0`;
+    }
+
+    function renderLivePlayer(){
+      const fbUrl = loadLiveUrl();
+      const iframe = document.getElementById("fbPlayer");
+      const msg = document.getElementById("noLiveMsg");
+
+      if (!fbUrl){
+        iframe.style.display = "none";
+        msg.style.display = "block";
+        return;
+      }
+
+      iframe.style.display = "block";
+      msg.style.display = "none";
+      iframe.src = buildFacebookEmbedSrc(fbUrl);
+    }
+
+    // ===== Players modal =====
+    function openTeamModal(team){
+      const playersMap = loadPlayers();
+      const players = Array.isArray(playersMap[team]) ? playersMap[team] : [];
+
+      modalTitle.textContent = team;
+
+      if (players.length === 0){
+        modalContent.innerHTML = `
+          <div class="muted">
+            No players added for this team yet.
+            <br/>Admin can add player names in <strong>admin.html</strong>.
+          </div>
+        `;
+      } else {
+        modalContent.innerHTML = `
+          <ul class="players">
+            ${players.map(p => `<li>${escapeHtml(p)}</li>`).join("")}
+          </ul>
+        `;
+      }
+
+      modalBackdrop.style.display = "flex";
+      modalBackdrop.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal(){
+      modalBackdrop.style.display = "none";
+      modalBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    modalClose.addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", (e)=>{
+      if (e.target === modalBackdrop) closeModal();
+    });
+    window.addEventListener("keydown", (e)=>{
+      if (e.key === "Escape") closeModal();
+    });
+
+    // click handler (event delegation)
+    document.addEventListener("click", (e)=>{
+      const link = e.target.closest("[data-team]");
+      if (!link) return;
+      e.preventDefault();
+      const team = link.getAttribute("data-team");
+      if (team) openTeamModal(team);
+    });
+
     function refreshAll(){
       const scores = loadScores();
       renderSchedule(scores);
       const stats = computeStandings(scores);
       renderTable(stats);
+      renderLivePlayer();
     }
 
     // Listen for updates from admin (same browser)
     window.addEventListener("storage", (e)=>{
-      if (e.key === STORAGE_KEY) refreshAll();
+      if (e.key === STORAGE_KEY || e.key === LIVE_URL_KEY || e.key === PLAYERS_KEY) refreshAll();
     });
 
     refreshBtn.addEventListener("click", refreshAll);
