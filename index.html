@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Intra Royal Cup (6 Games)</title>
+  <title>Intra Royal Cup (Viewer)</title>
   <style>
     :root{
       --bg:#0b1020;
@@ -38,24 +38,10 @@
       gap:14px;
       flex-wrap:wrap;
     }
-    h1{
-      margin:0;
-      font-size:28px;
-      letter-spacing:.2px;
-    }
-    .subtitle{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.4;
-    }
-    .controls{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    button{
+    h1{ margin:0; font-size:28px; letter-spacing:.2px; }
+    .subtitle{ margin:6px 0 0; color:var(--muted); font-size:14px; line-height:1.4; }
+    .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    button, a.btn{
       border:1px solid var(--line);
       background: linear-gradient(180deg, var(--btn) 0%, var(--btn2) 100%);
       color:var(--text);
@@ -65,14 +51,18 @@
       box-shadow: 0 8px 18px rgba(0,0,0,.25);
       font-weight:600;
       font-size:13px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
     }
-    button:hover{ filter:brightness(1.08); }
-    button:active{ transform: translateY(1px); }
+    button:hover, a.btn:hover{ filter:brightness(1.08); }
+    button:active, a.btn:active{ transform: translateY(1px); }
 
     main{
       max-width:1100px;
       margin:0 auto;
-      padding:12px 18px 30px;
+      padding:12px 18px 20px;
       display:grid;
       gap:14px;
       grid-template-columns: 1.2fr .8fr;
@@ -108,11 +98,7 @@
     }
 
     /* Schedule */
-    .schedule{
-      padding:14px 16px 18px;
-      display:grid;
-      gap:12px;
-    }
+    .schedule{ padding:14px 16px 18px; display:grid; gap:12px; }
     .matchday{
       border:1px solid var(--line);
       border-radius:14px;
@@ -132,10 +118,6 @@
       text-transform:uppercase;
       color:#dbe4ff;
     }
-    .games{
-      display:grid;
-      gap:10px;
-    }
     .game{
       display:grid;
       grid-template-columns: 1fr auto 1fr;
@@ -146,57 +128,32 @@
       border:1px solid var(--line);
       background: rgba(0,0,0,.15);
     }
-    .team{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-width:0;
-    }
-    .team .name{
-      font-weight:700;
-      font-size:14px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .team .hint{
-      font-size:12px;
-      color:var(--muted);
-    }
+    .team{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .team .name{ font-weight:700; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .team .hint{ font-size:12px; color:var(--muted); }
+
     .scorebox{
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:10px;
       justify-content:center;
       white-space:nowrap;
+      font-weight:800;
+      letter-spacing:.3px;
     }
-    input[type="number"]{
-      width:64px;
-      padding:10px 10px;
+    .score{
+      min-width:44px;
+      padding:8px 10px;
       border-radius:12px;
       border:1px solid var(--line);
       background: rgba(255,255,255,.04);
-      color:var(--text);
-      font-weight:700;
-      font-size:14px;
       text-align:center;
-      outline:none;
+      font-size:14px;
     }
-    input[type="number"]:focus{
-      border-color: rgba(142,160,199,.6);
-      box-shadow: 0 0 0 3px rgba(142,160,199,.18);
-    }
-    .vs{
-      font-size:12px;
-      color:var(--muted);
-      padding:0 2px;
-      user-select:none;
-    }
+    .vs{ font-size:12px; color:var(--muted); user-select:none; }
 
     /* Standings */
-    .standings{
-      padding:12px 16px 18px;
-    }
+    .standings{ padding:12px 16px 18px; }
     table{
       width:100%;
       border-collapse:separate;
@@ -212,26 +169,11 @@
       border-bottom:1px solid var(--line);
       font-size:13px;
     }
-    th{
-      color:var(--muted);
-      font-weight:700;
-      background: rgba(255,255,255,.03);
-    }
+    th{ color:var(--muted); font-weight:700; background: rgba(255,255,255,.03); }
     td:first-child, th:first-child{ text-align:left; }
     tr:last-child td{ border-bottom:none; }
-    .teamcell{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-      letter-spacing:.2px;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:50%;
-      background: rgba(255,255,255,.30);
-      border:1px solid var(--line);
-      flex:0 0 auto;
-    }
+    .teamcell{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; }
+    .dot{ width:10px;height:10px;border-radius:50%; background: rgba(255,255,255,.30); border:1px solid var(--line); flex:0 0 auto; }
     .legend{
       margin-top:10px;
       color:var(--muted);
@@ -250,16 +192,28 @@
       font-size:12px;
       line-height:1.45;
     }
-    .badge{
-      display:inline-block;
-      padding:2px 8px;
-      border-radius:999px;
+
+    /* Player section */
+    .fbwrap{
+      max-width:1100px;
+      margin:0 auto 30px;
+      padding:0 18px 30px;
+    }
+    .player{ padding:14px 16px 18px; }
+    .player-frame{
       border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      color:var(--text);
-      font-weight:700;
-      font-size:11px;
-      margin-left:6px;
+      border-radius:14px;
+      overflow:hidden;
+      background: rgba(0,0,0,.18);
+    }
+    .player-frame iframe{
+      width:100%;
+      height:520px;
+      border:0;
+      display:block;
+    }
+    @media (max-width: 700px){
+      .player-frame iframe{ height:320px; }
     }
   </style>
 </head>
@@ -268,12 +222,12 @@
   <header>
     <div class="title">
       <div>
-        <h1>Intra Royal Cup <span class="badge">6 Games</span></h1>
-        <p class="subtitle">Enter scores to auto-update standings (W/D/L, GF/GA/GD, Points).</p>
+        <h1>Intra Royal Cup <span class="pill">Viewer</span></h1>
+        <p class="subtitle">Scores are updated by Admin. This page is view-only.</p>
       </div>
       <div class="controls">
-        <button id="resetBtn" type="button">Reset Scores</button>
-        <button id="demoBtn" type="button">Random Demo Scores</button>
+        <button id="refreshBtn" type="button">Refresh Scores</button>
+        <a class="btn" href="admin.html" title="Open Admin page">Admin</a>
       </div>
     </div>
   </header>
@@ -283,9 +237,12 @@
     <section class="card">
       <h2>
         Schedule
-        <span class="pill">Round Robin (1x)</span>
+        <span class="pill">Match list</span>
       </h2>
       <div class="schedule" id="schedule"></div>
+      <div class="note" style="margin:0 16px 16px;">
+        If you don’t see updates, click <strong>Refresh Scores</strong>.
+      </div>
     </section>
 
     <!-- Standings -->
@@ -314,14 +271,41 @@
 
         <div class="legend">
           <div><strong>GF</strong>=Goals For, <strong>GA</strong>=Goals Against, <strong>GD</strong>=Goal Diff</div>
-          <div class="note">Tip: leaving a score blank means the game is not played yet.</div>
+          <div class="note">Blank score means not played yet.</div>
         </div>
       </div>
     </aside>
   </main>
 
+  <!-- Facebook Live Player (autoplay + muted) -->
+  <div class="fbwrap">
+    <section class="card">
+      <h2>
+        Live Stream
+        <span class="pill">Facebook Live</span>
+      </h2>
+      <div class="player">
+        <div class="player-frame">
+          <!-- Replace YOUR_PAGE_NAME and YOUR_VIDEO_ID -->
+          <iframe
+            src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/YOUR_PAGE_NAME/videos/YOUR_VIDEO_ID/&autoplay=1&mute=1&show_text=0"
+            scrolling="no"
+            frameborder="0"
+            allowfullscreen="true"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          </iframe>
+        </div>
+        <div class="note" style="margin-top:12px;">
+          Autoplay works only when muted (browser restriction).
+        </div>
+      </div>
+    </section>
+  </div>
+
   <script>
-    // Use constants so the names match everywhere (TEAMS and MATCHDAYS)
+    // ===== Shared data (same in admin.html) =====
+    const STORAGE_KEY = "royalCupScores_v1";
+
     const A = "Arbin(Ma-Kalu)";
     const R = "Rooster(Eagle Eye)";
     const M = "Mama(Mama-Vanja)";
@@ -329,40 +313,28 @@
 
     const TEAMS = [A, R, M, G];
 
-    const MATCHDAYS = [
-      {
-        title: "Matchday 1",
-        games: [
-          { id: "g1", home: A, away: R },
-          { id: "g2", home: M, away: G }
-        ]
-      },
-      {
-        title: "Matchday 2",
-        games: [
-          { id: "g3", home: A, away: M },
-          { id: "g4", home: R, away: G }
-        ]
-      },
-      {
-        title: "Matchday 3",
-        games: [
-          { id: "g5", home: A, away: G },
-          { id: "g6", home: R, away: M }
-        ]
-      }
+    const MATCHES = [
+      { id: "g1", title: "Match 1", home: A, away: R },
+      { id: "g2", title: "Match 2", home: M, away: G },
+      { id: "g3", title: "Match 3", home: A, away: M },
+      { id: "g4", title: "Match 4", home: R, away: G },
+      { id: "g5", title: "Match 5", home: A, away: G },
+      { id: "g6", title: "Match 6", home: R, away: M }
     ];
 
     const scheduleEl = document.getElementById("schedule");
     const tableBodyEl = document.getElementById("tableBody");
-    const resetBtn = document.getElementById("resetBtn");
-    const demoBtn = document.getElementById("demoBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
 
-    function clampNonNegativeInt(v){
-      if (v === "" || v === null || v === undefined) return null;
-      const n = Number(v);
-      if (!Number.isFinite(n)) return null;
-      return Math.max(0, Math.floor(n));
+    function loadScores(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return {};
+        const obj = JSON.parse(raw);
+        return (obj && typeof obj === "object") ? obj : {};
+      }catch(e){
+        return {};
+      }
     }
 
     function emptyStats(){
@@ -373,31 +345,30 @@
       return stats;
     }
 
-    function computeStandings(){
+    function computeStandings(scores){
       const stats = emptyStats();
 
-      for (const md of MATCHDAYS){
-        for (const game of md.games){
-          const h = game.home, a = game.away;
-          const hs = clampNonNegativeInt(document.querySelector(`[data-game="${game.id}"][data-side="home"]`)?.value);
-          const as = clampNonNegativeInt(document.querySelector(`[data-game="${game.id}"][data-side="away"]`)?.value);
+      for (const game of MATCHES){
+        const h = game.home, a = game.away;
+        const entry = scores[game.id] || {};
+        const hs = Number.isInteger(entry.home) ? entry.home : null;
+        const as = Number.isInteger(entry.away) ? entry.away : null;
 
-          if (hs === null || as === null) continue;
+        if (hs === null || as === null) continue;
 
-          stats[h].P++; stats[a].P++;
-          stats[h].GF += hs; stats[h].GA += as;
-          stats[a].GF += as; stats[a].GA += hs;
+        stats[h].P++; stats[a].P++;
+        stats[h].GF += hs; stats[h].GA += as;
+        stats[a].GF += as; stats[a].GA += hs;
 
-          if (hs > as){
-            stats[h].W++; stats[a].L++;
-            stats[h].Pts += 3;
-          } else if (hs < as){
-            stats[a].W++; stats[h].L++;
-            stats[a].Pts += 3;
-          } else {
-            stats[h].D++; stats[a].D++;
-            stats[h].Pts += 1; stats[a].Pts += 1;
-          }
+        if (hs > as){
+          stats[h].W++; stats[a].L++;
+          stats[h].Pts += 3;
+        } else if (hs < as){
+          stats[a].W++; stats[h].L++;
+          stats[a].Pts += 3;
+        } else {
+          stats[h].D++; stats[a].D++;
+          stats[h].Pts += 1; stats[a].Pts += 1;
         }
       }
 
@@ -405,15 +376,15 @@
         stats[t].GD = stats[t].GF - stats[t].GA;
       }
 
-      const sorted = [...TEAMS].sort((x,y)=>{
+      return stats;
+    }
+
+    function renderTable(stats){
+      const order = [...TEAMS].sort((x,y)=>{
         const A = stats[x], B = stats[y];
         return (B.Pts - A.Pts) || (B.GD - A.GD) || (B.GF - A.GF) || x.localeCompare(y);
       });
 
-      renderTable(sorted, stats);
-    }
-
-    function renderTable(order, stats){
       tableBodyEl.innerHTML = "";
       for (const team of order){
         const s = stats[team];
@@ -438,79 +409,59 @@
       }
     }
 
-    function buildScheduleUI(){
+    function renderSchedule(scores){
       scheduleEl.innerHTML = "";
+      for (const g of MATCHES){
+        const entry = scores[g.id] || {};
+        const hs = Number.isInteger(entry.home) ? entry.home : "";
+        const as = Number.isInteger(entry.away) ? entry.away : "";
 
-      for (const md of MATCHDAYS){
         const wrap = document.createElement("div");
         wrap.className = "matchday";
         wrap.innerHTML = `
           <div class="matchday-title">
-            <strong>${md.title}</strong>
-            <span class="pill">${md.games.length} games</span>
+            <strong>${g.title}</strong>
+            <span class="pill">${hs === "" || as === "" ? "Not played" : "Played"}</span>
           </div>
-          <div class="games"></div>
-        `;
-        const gamesEl = wrap.querySelector(".games");
 
-        for (const g of md.games){
-          const row = document.createElement("div");
-          row.className = "game";
-          row.innerHTML = `
+          <div class="game">
             <div class="team">
               <div class="name">${g.home}</div>
               <div class="hint">Home</div>
             </div>
 
             <div class="scorebox">
-              <input type="number" min="0" inputmode="numeric" placeholder="-" data-game="${g.id}" data-side="home" />
+              <div class="score">${hs === "" ? "-" : hs}</div>
               <span class="vs">vs</span>
-              <input type="number" min="0" inputmode="numeric" placeholder="-" data-game="${g.id}" data-side="away" />
+              <div class="score">${as === "" ? "-" : as}</div>
             </div>
 
             <div class="team" style="text-align:right">
               <div class="name">${g.away}</div>
               <div class="hint">Away</div>
             </div>
-          `;
-          gamesEl.appendChild(row);
-        }
-
+          </div>
+        `;
         scheduleEl.appendChild(wrap);
       }
-
-      scheduleEl.querySelectorAll('input[type="number"]').forEach(inp=>{
-        inp.addEventListener("input", ()=>{
-          if (inp.value === "") return computeStandings();
-          const n = clampNonNegativeInt(inp.value);
-          inp.value = (n === null ? "" : String(n));
-          computeStandings();
-        });
-      });
     }
 
-    function resetScores(){
-      document.querySelectorAll('input[type="number"]').forEach(i=> i.value = "");
-      computeStandings();
+    function refreshAll(){
+      const scores = loadScores();
+      renderSchedule(scores);
+      const stats = computeStandings(scores);
+      renderTable(stats);
     }
 
-    function randomDemoScores(){
-      for (const md of MATCHDAYS){
-        for (const g of md.games){
-          const hs = Math.floor(Math.random()*6);
-          const as = Math.floor(Math.random()*6);
-          document.querySelector(`[data-game="${g.id}"][data-side="home"]`).value = hs;
-          document.querySelector(`[data-game="${g.id}"][data-side="away"]`).value = as;
-        }
-      }
-      computeStandings();
-    }
+    // Listen for updates from admin (same browser)
+    window.addEventListener("storage", (e)=>{
+      if (e.key === STORAGE_KEY) refreshAll();
+    });
 
-    buildScheduleUI();
-    computeStandings();
+    refreshBtn.addEventListener("click", refreshAll);
 
-    resetBtn.addEventListener("click", resetScores);
-    demoBtn.addEventListener("click", randomDemoScores);
+    // Initial render
+    refreshAll();
   </script>
 </body>
 </html>
