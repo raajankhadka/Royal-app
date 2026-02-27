@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Intra Royal Cup (6 Games)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#121a33;
+      --muted:#8ea0c7;
+      --text:#e8eeff;
+      --line:rgba(255,255,255,.10);
+      --good:#44d07b;
+      --warn:#ffcc66;
+      --bad:#ff6b6b;
+      --btn:#2b3b74;
+      --btn2:#1d2a55;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% -10%, #24306d 0%, transparent 55%),
+                  radial-gradient(900px 700px at 100% 0%, #2a7bbf 0%, transparent 45%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      padding:28px 18px 10px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size:28px;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.4;
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    button{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, var(--btn) 0%, var(--btn2) 100%);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      font-weight:600;
+      font-size:13px;
+    }
+    button:hover{ filter:brightness(1.08); }
+    button:active{ transform: translateY(1px); }
+    main{
+      max-width:1100px;
+      margin:0 auto;
+      padding:12px 18px 30px;
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 980px){
+      main{ grid-template-columns: 1fr; }
+    }
+    .card{
+      background:rgba(18,26,51,.85);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card h2{
+      margin:0;
+      padding:14px 16px;
+      font-size:16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+
+    /* Schedule */
+    .schedule{
+      padding:14px 16px 18px;
+      display:grid;
+      gap:12px;
+    }
+    .matchday{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background: rgba(255,255,255,.03);
+    }
+    .matchday-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .matchday-title strong{
+      font-size:13px;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      color:#dbe4ff;
+    }
+    .games{
+      display:grid;
+      gap:10px;
+    }
+    .game{
+      display:grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.15);
+    }
+    .team{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+    .team .name{
+      font-weight:700;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .team .hint{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .scorebox{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      justify-content:center;
+      white-space:nowrap;
+    }
+    input[type="number"]{
+      width:64px;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      font-weight:700;
+      font-size:14px;
+      text-align:center;
+      outline:none;
+    }
+    input[type="number"]:focus{
+      border-color: rgba(142,160,199,.6);
+      box-shadow: 0 0 0 3px rgba(142,160,199,.18);
+    }
+    .vs{
+      font-size:12px;
+      color:var(--muted);
+      padding:0 2px;
+      user-select:none;
+    }
+
+    /* Standings */
+    .standings{
+      padding:12px 16px 18px;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background: rgba(255,255,255,.03);
+    }
+    th, td{
+      padding:10px 10px;
+      text-align:right;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+    }
+    th{
+      color:var(--muted);
+      font-weight:700;
+      background: rgba(255,255,255,.03);
+    }
+    td:first-child, th:first-child{ text-align:left; }
+    tr:last-child td{ border-bottom:none; }
+    .teamcell{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: rgba(255,255,255,.30);
+      border:1px solid var(--line);
+      flex:0 0 auto;
+    }
+    .legend{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+      border-top:1px solid var(--line);
+      padding-top:10px;
+    }
+    .note{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px dashed rgba(255,255,255,.18);
+      color:var(--muted);
+      background: rgba(0,0,0,.12);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .badge{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--text);
+      font-weight:700;
+      font-size:11px;
+      margin-left:6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <div>
+        <h1>4-Team League <span class="badge">6 Games</span></h1>
+        <p class="subtitle">Enter scores to auto-update standings (W/D/L, GF/GA/GD, Points).</p>
+      </div>
+      <div class="controls">
+        <button id="resetBtn" type="button">Reset Scores</button>
+        <button id="demoBtn" type="button">Random Demo Scores</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Schedule -->
+    <section class="card">
+      <h2>
+        Schedule
+        <span class="pill">Round Robin (1x)</span>
+      </h2>
+      <div class="schedule" id="schedule"></div>
+    </section>
+
+    <!-- Standings -->
+    <aside class="card">
+      <h2>
+        Standings
+        <span class="pill">Win=3 • Draw=1 • Loss=0</span>
+      </h2>
+      <div class="standings">
+        <table>
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>P</th>
+              <th>W</th>
+              <th>D</th>
+              <th>L</th>
+              <th>GF</th>
+              <th>GA</th>
+              <th>GD</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+
+        <div class="legend">
+          <div><strong>GF</strong>=Goals For, <strong>GA</strong>=Goals Against, <strong>GD</strong>=Goal Diff</div>
+          <div class="note">
+            Tip: leaving a score blank means the game is not played yet.
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Teams
+    const TEAMS = ["Arbin(Ma-Kalu)", "Rooster(Eagle Eye)", "Mama(Mama-Vanja)", "Ganesh(B-Bites FC)"];
+
+    // 6-game schedule (3 matchdays, 2 games each)
+    const MATCHDAYS = [
+      {
+        title: "Matchday 1",
+        games: [
+          { id: "g1", home: "Arbin(Ma-Kalu)",   away: "Rooster(Eagle Eye)" },
+          { id: "g2", home: "Mama(Mama-Vanja)",    away: "Ganesh(B-Bites FC)"  }
+        ]
+      },
+      {
+        title: "Matchday 2",
+        games: [
+          { id: "g3", home: "Arbin",   away: "Mama"    },
+          { id: "g4", home: "Rooster", away: "Ganesh"  }
+        ]
+      },
+      {
+        title: "Matchday 3",
+        games: [
+          { id: "g5", home: "Arbin",   away: "Ganesh"  },
+          { id: "g6", home: "Rooster", away: "Mama"    }
+        ]
+      }
+    ];
+
+    const scheduleEl = document.getElementById("schedule");
+    const tableBodyEl = document.getElementById("tableBody");
+    const resetBtn = document.getElementById("resetBtn");
+    const demoBtn = document.getElementById("demoBtn");
+
+    // Helpers
+    function clampNonNegativeInt(v){
+      if (v === "" || v === null || v === undefined) return null;
+      const n = Number(v);
+      if (!Number.isFinite(n)) return null;
+      return Math.max(0, Math.floor(n));
+    }
+
+    function emptyStats(){
+      const stats = {};
+      for (const t of TEAMS){
+        stats[t] = { P:0, W:0, D:0, L:0, GF:0, GA:0, GD:0, Pts:0 };
+      }
+      return stats;
+    }
+
+    function computeStandings(){
+      const stats = emptyStats();
+
+      for (const md of MATCHDAYS){
+        for (const game of md.games){
+          const h = game.home, a = game.away;
+          const hs = clampNonNegativeInt(document.querySelector(`[data-game="${game.id}"][data-side="home"]`)?.value);
+          const as = clampNonNegativeInt(document.querySelector(`[data-game="${game.id}"][data-side="away"]`)?.value);
+
+          // Game not played yet if either is blank
+          if (hs === null || as === null) continue;
+
+          stats[h].P++; stats[a].P++;
+          stats[h].GF += hs; stats[h].GA += as;
+          stats[a].GF += as; stats[a].GA += hs;
+
+          if (hs > as){
+            stats[h].W++; stats[a].L++;
+            stats[h].Pts += 3;
+          } else if (hs < as){
+            stats[a].W++; stats[h].L++;
+            stats[a].Pts += 3;
+          } else {
+            stats[h].D++; stats[a].D++;
+            stats[h].Pts += 1; stats[a].Pts += 1;
+          }
+        }
+      }
+
+      // GD
+      for (const t of TEAMS){
+        stats[t].GD = stats[t].GF - stats[t].GA;
+      }
+
+      // Sort: Points desc, GD desc, GF desc, Team name asc
+      const sorted = [...TEAMS].sort((x,y)=>{
+        const A = stats[x], B = stats[y];
+        return (B.Pts - A.Pts) || (B.GD - A.GD) || (B.GF - A.GF) || x.localeCompare(y);
+      });
+
+      renderTable(sorted, stats);
+    }
+
+    function renderTable(order, stats){
+      tableBodyEl.innerHTML = "";
+      for (const team of order){
+        const s = stats[team];
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <div class="teamcell">
+              <span class="dot"></span>
+              <span>${team}</span>
+            </div>
+          </td>
+          <td>${s.P}</td>
+          <td>${s.W}</td>
+          <td>${s.D}</td>
+          <td>${s.L}</td>
+          <td>${s.GF}</td>
+          <td>${s.GA}</td>
+          <td>${s.GD}</td>
+          <td><strong>${s.Pts}</strong></td>
+        `;
+        tableBodyEl.appendChild(tr);
+      }
+    }
+
+    function buildScheduleUI(){
+      scheduleEl.innerHTML = "";
+
+      for (const md of MATCHDAYS){
+        const wrap = document.createElement("div");
+        wrap.className = "matchday";
+        wrap.innerHTML = `
+          <div class="matchday-title">
+            <strong>${md.title}</strong>
+            <span class="pill">${md.games.length} games</span>
+          </div>
+          <div class="games"></div>
+        `;
+        const gamesEl = wrap.querySelector(".games");
+
+        for (const g of md.games){
+          const row = document.createElement("div");
+          row.className = "game";
+          row.innerHTML = `
+            <div class="team">
+              <div class="name">${g.home}</div>
+              <div class="hint">Home</div>
+            </div>
+
+            <div class="scorebox">
+              <input type="number" min="0" inputmode="numeric" placeholder="-" data-game="${g.id}" data-side="home" />
+              <span class="vs">vs</span>
+              <input type="number" min="0" inputmode="numeric" placeholder="-" data-game="${g.id}" data-side="away" />
+            </div>
+
+            <div class="team" style="text-align:right">
+              <div class="name">${g.away}</div>
+              <div class="hint">Away</div>
+            </div>
+          `;
+          gamesEl.appendChild(row);
+        }
+
+        scheduleEl.appendChild(wrap);
+      }
+
+      // Bind events
+      scheduleEl.querySelectorAll('input[type="number"]').forEach(inp=>{
+        inp.addEventListener("input", ()=>{
+          // Clean value to non-negative int, allow blank
+          if (inp.value === "") return computeStandings();
+          const n = clampNonNegativeInt(inp.value);
+          inp.value = (n === null ? "" : String(n));
+          computeStandings();
+        });
+      });
+    }
+
+    function resetScores(){
+      document.querySelectorAll('input[type="number"]').forEach(i=> i.value = "");
+      computeStandings();
+    }
+
+    function randomDemoScores(){
+      // Fill all games with 0-5 random scores
+      for (const md of MATCHDAYS){
+        for (const g of md.games){
+          const hs = Math.floor(Math.random()*6);
+          const as = Math.floor(Math.random()*6);
+          document.querySelector(`[data-game="${g.id}"][data-side="home"]`).value = hs;
+          document.querySelector(`[data-game="${g.id}"][data-side="away"]`).value = as;
+        }
+      }
+      computeStandings();
+    }
+
+    // Init
+    buildScheduleUI();
+    computeStandings();
+
+    resetBtn.addEventListener("click", resetScores);
+    demoBtn.addEventListener("click", randomDemoScores);
+  </script>
+</body>
+</html>
