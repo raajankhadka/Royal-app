@@ -6,39 +6,21 @@
   <title>Intra Royal Cup (Admin)</title>
   <style>
     :root{
-      --bg:#0b1020;
-      --card:#121a33;
-      --muted:#8ea0c7;
-      --text:#e8eeff;
-      --line:rgba(255,255,255,.10);
-      --btn:#2b3b74;
-      --btn2:#1d2a55;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 16px;
-      --danger:#a43a3a;
+      --bg:#0b1020; --card:#121a33; --muted:#8ea0c7; --text:#e8eeff;
+      --line:rgba(255,255,255,.10); --btn:#2b3b74; --btn2:#1d2a55;
+      --shadow: 0 10px 30px rgba(0,0,0,.35); --radius: 16px; --danger:#a43a3a;
+      --ok:#2a7a4b;
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: radial-gradient(1200px 800px at 20% -10%, #24306d 0%, transparent 55%),
                   radial-gradient(900px 700px at 100% 0%, #2a7bbf 0%, transparent 45%),
                   var(--bg);
-      color:var(--text);
-      min-height:100vh;
+      color:var(--text); min-height:100vh;
     }
-    header{
-      padding:28px 18px 10px;
-      max-width:1100px;
-      margin:0 auto;
-    }
-    .title{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
+    header{ padding:28px 18px 10px; max-width:1100px; margin:0 auto; }
+    .title{ display:flex; align-items:flex-end; justify-content:space-between; gap:14px; flex-wrap:wrap; }
     h1{ margin:0; font-size:28px; letter-spacing:.2px; }
     .subtitle{ margin:6px 0 0; color:var(--muted); font-size:14px; line-height:1.4; }
     .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
@@ -46,157 +28,66 @@
       border:1px solid var(--line);
       background: linear-gradient(180deg, var(--btn) 0%, var(--btn2) 100%);
       color:var(--text);
-      padding:10px 12px;
-      border-radius:12px;
-      cursor:pointer;
+      padding:10px 12px; border-radius:12px; cursor:pointer;
       box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      font-weight:600;
-      font-size:13px;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      font-weight:700; font-size:13px; text-decoration:none;
+      display:inline-flex; align-items:center; gap:8px;
     }
     button:hover, a.btn:hover{ filter:brightness(1.08); }
     button:active, a.btn:active{ transform: translateY(1px); }
-
-    .danger{
-      background: linear-gradient(180deg, #c14c4c 0%, var(--danger) 100%);
-    }
-
-    main{
-      max-width:1100px;
-      margin:0 auto;
-      padding:12px 18px 30px;
-      display:grid;
-      gap:14px;
-      grid-template-columns: 1fr;
-    }
+    main{ max-width:1100px; margin:0 auto; padding:12px 18px 30px; display:grid; gap:14px; }
     .card{
-      background:rgba(18,26,51,.85);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
+      background:rgba(18,26,51,.85); border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow: var(--shadow); overflow:hidden;
     }
     .card h2{
-      margin:0;
-      padding:14px 16px;
-      font-size:16px;
+      margin:0; padding:14px 16px; font-size:16px;
       border-bottom:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
     }
     .pill{
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid var(--line);
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.03);
+      font-size:12px; color:var(--muted); border:1px solid var(--line);
+      padding:6px 10px; border-radius:999px; background: rgba(255,255,255,.03);
       white-space:nowrap;
     }
-
     .schedule{ padding:14px 16px 18px; display:grid; gap:12px; }
     .match{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
+      border:1px solid var(--line); border-radius:14px; padding:12px;
       background: rgba(255,255,255,.03);
     }
-    .match-title{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .match-title strong{
-      font-size:13px;
-      letter-spacing:.3px;
-      text-transform:uppercase;
-      color:#dbe4ff;
-    }
+    .match-title{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+    .match-title strong{ font-size:13px; letter-spacing:.3px; text-transform:uppercase; color:#dbe4ff; }
     .game{
-      display:grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap:10px;
-      align-items:center;
-      padding:10px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.15);
+      display:grid; grid-template-columns: 1fr auto 1fr; gap:10px; align-items:center;
+      padding:10px; border-radius:12px; border:1px solid var(--line); background: rgba(0,0,0,.15);
     }
     .team{ display:flex; flex-direction:column; gap:2px; min-width:0; }
     .team .name{ font-weight:800; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .team .hint{ font-size:12px; color:var(--muted); }
     .scorebox{ display:flex; align-items:center; gap:8px; justify-content:center; white-space:nowrap; }
-    input[type="number"]{
-      width:64px;
-      padding:10px 10px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      color:var(--text);
-      font-weight:800;
-      font-size:14px;
-      text-align:center;
-      outline:none;
+    input[type="number"], input[type="password"]{
+      padding:10px 10px; border-radius:12px; border:1px solid var(--line);
+      background: rgba(255,255,255,.04); color:var(--text);
+      font-weight:800; font-size:14px; outline:none;
     }
-    input[type="number"]:focus{
-      border-color: rgba(142,160,199,.6);
-      box-shadow: 0 0 0 3px rgba(142,160,199,.18);
-    }
+    input[type="number"]{ width:64px; text-align:center; }
+    input:focus{ border-color: rgba(142,160,199,.6); box-shadow: 0 0 0 3px rgba(142,160,199,.18); }
     .vs{ font-size:12px; color:var(--muted); user-select:none; }
 
     .note{
-      margin:14px 16px 16px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px dashed rgba(255,255,255,.18);
-      color:var(--muted);
-      background: rgba(0,0,0,.12);
-      font-size:12px;
-      line-height:1.45;
+      margin:0 16px 16px; padding:10px 12px; border-radius:14px;
+      border:1px dashed rgba(255,255,255,.18); color:var(--muted);
+      background: rgba(0,0,0,.12); font-size:12px; line-height:1.45;
     }
-
-    .textinput{
-      width:100%;
-      padding:12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      outline:none;
-      font-size:14px;
+    .status{
+      margin:0 16px 16px; padding:10px 12px; border-radius:14px;
+      border:1px solid var(--line); background: rgba(255,255,255,.04);
+      font-size:13px; color:var(--muted);
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
-    .textinput:focus{
-      border-color: rgba(142,160,199,.6);
-      box-shadow: 0 0 0 3px rgba(142,160,199,.18);
-    }
-
-    textarea{
-      min-height:110px;
-      resize:vertical;
-      line-height:1.4;
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .grid2{
-      display:grid;
-      gap:12px;
-      grid-template-columns: 1fr 1fr;
-    }
-    @media (max-width: 900px){
-      .grid2{ grid-template-columns: 1fr; }
-    }
+    .tag{ padding:2px 8px; border-radius:999px; border:1px solid var(--line); background: rgba(255,255,255,.03); color:var(--text); font-weight:800; font-size:11px; }
+    .tag.ok{ background: rgba(42,122,75,.18); border-color: rgba(42,122,75,.35); }
+    .tag.bad{ background: rgba(164,58,58,.18); border-color: rgba(164,58,58,.35); }
   </style>
 </head>
 
@@ -205,115 +96,50 @@
     <div class="title">
       <div>
         <h1>Intra Royal Cup <span class="pill">Admin</span></h1>
-        <p class="subtitle">Admin updates: Live URL, Players per team, and Scores.</p>
+        <p class="subtitle">Enter scores and click <strong>Complete</strong>. This auto-updates <code>scores.json</code> in GitHub.</p>
       </div>
       <div class="controls">
-        <button id="saveBtn" type="button">Save Scores</button>
-        <button id="resetBtn" class="danger" type="button">Reset Scores</button>
+        <button id="completeBtn" type="button">Complete / Save</button>
         <a class="btn" href="index.html">Viewer</a>
       </div>
     </div>
   </header>
 
   <main>
-    <!-- Live settings -->
     <section class="card">
-      <h2>
-        Live Stream Settings
-        <span class="pill">Paste FB live link</span>
-      </h2>
+      <h2>Admin Secret <span class="pill">Required</span></h2>
       <div class="schedule">
         <div class="match">
           <div class="match-title">
-            <strong>Facebook Live Video URL</strong>
-            <span class="pill">Admin</span>
+            <strong>Enter Admin Secret</strong>
+            <span class="pill">Matches Netlify env var</span>
           </div>
-
-          <div style="display:grid; gap:10px;">
-            <input
-              id="liveUrlInput"
-              class="textinput"
-              type="text"
-              placeholder="https://www.facebook.com/yourpage/videos/1234567890/"
-            />
-            <div class="row">
-              <button id="saveLiveBtn" type="button">Save Live URL</button>
-              <button id="clearLiveBtn" class="danger" type="button">Clear Live URL</button>
-            </div>
-            <div class="note" style="margin:0;">
-              Go Live on Facebook normally. Copy the live video URL and paste it here.
-            </div>
-          </div>
+          <input id="secret" type="password" placeholder="Admin secret (e.g., royal123)" />
         </div>
       </div>
+      <div class="note">This prevents random visitors from committing to your repo.</div>
     </section>
 
-    <!-- Players settings -->
     <section class="card">
-      <h2>
-        Team Players
-        <span class="pill">One name per line</span>
-      </h2>
-      <div class="schedule">
-        <div class="grid2">
-          <div class="match">
-            <div class="match-title"><strong>Arbin(Ma-Kalu)</strong><span class="pill">Players</span></div>
-            <textarea id="playersA" class="textinput" placeholder="Player 1&#10;Player 2&#10;Player 3"></textarea>
-          </div>
-
-          <div class="match">
-            <div class="match-title"><strong>Rooster(Eagle Eye)</strong><span class="pill">Players</span></div>
-            <textarea id="playersR" class="textinput" placeholder="Player 1&#10;Player 2"></textarea>
-          </div>
-
-          <div class="match">
-            <div class="match-title"><strong>Mama(Mama-Vanja)</strong><span class="pill">Players</span></div>
-            <textarea id="playersM" class="textinput"></textarea>
-          </div>
-
-          <div class="match">
-            <div class="match-title"><strong>Ganesh(B-Bites FC)</strong><span class="pill">Players</span></div>
-            <textarea id="playersG" class="textinput"></textarea>
-          </div>
-        </div>
-
-        <div class="row" style="padding:0 2px;">
-          <button id="savePlayersBtn" type="button">Save Players</button>
-          <button id="clearPlayersBtn" class="danger" type="button">Clear Players</button>
-        </div>
-
-        <div class="note" style="margin-top:10px;">
-          Viewer can click a team name (schedule or standings) to see the player list.
-        </div>
-      </div>
-    </section>
-
-    <!-- Score editing -->
-    <section class="card">
-      <h2>
-        Update Scores
-        <span class="pill">Match 1–6</span>
-      </h2>
+      <h2>Update Scores <span class="pill">Match 1–6</span></h2>
       <div class="schedule" id="schedule"></div>
+      <div class="status" id="statusBar">
+        <div>Status: <span id="statusText">Ready</span></div>
+        <div><span class="tag" id="statusTag">IDLE</span></div>
+      </div>
       <div class="note">
-        Enter scores, then click <strong>Save Scores</strong>. Viewer updates automatically in the same browser.
+        Tip: Enter scores for any matches that are finished. Click <strong>Complete / Save</strong>.
+        The function merges with existing <code>scores.json</code> so older results stay.
       </div>
     </section>
   </main>
 
   <script>
-    // ===== Shared storage keys =====
-    const STORAGE_KEY = "royalCupScores_v1";
-    const LIVE_URL_KEY = "royalCupLiveUrl_v1";
-    const PLAYERS_KEY = "royalCupPlayers_v1";
-
-    // Teams
     const A = "Arbin(Ma-Kalu)";
     const R = "Rooster(Eagle Eye)";
     const M = "Mama(Mama-Vanja)";
     const G = "Ganesh(B-Bites FC)";
 
-    // Match list
     const MATCHES = [
       { id: "g1", title: "Match 1", home: A, away: R },
       { id: "g2", title: "Match 2", home: M, away: G },
@@ -324,29 +150,16 @@
     ];
 
     const scheduleEl = document.getElementById("schedule");
-    const saveBtn = document.getElementById("saveBtn");
-    const resetBtn = document.getElementById("resetBtn");
+    const completeBtn = document.getElementById("completeBtn");
+    const secretEl = document.getElementById("secret");
 
-    // Live URL elements
-    const liveUrlInput = document.getElementById("liveUrlInput");
-    const saveLiveBtn = document.getElementById("saveLiveBtn");
-    const clearLiveBtn = document.getElementById("clearLiveBtn");
+    const statusText = document.getElementById("statusText");
+    const statusTag = document.getElementById("statusTag");
 
-    // Players elements
-    const playersA = document.getElementById("playersA");
-    const playersR = document.getElementById("playersR");
-    const playersM = document.getElementById("playersM");
-    const playersG = document.getElementById("playersG");
-    const savePlayersBtn = document.getElementById("savePlayersBtn");
-    const clearPlayersBtn = document.getElementById("clearPlayersBtn");
-
-    function safeParseJSON(raw, fallback){
-      try{
-        const v = JSON.parse(raw);
-        return (v && typeof v === "object") ? v : fallback;
-      }catch{
-        return fallback;
-      }
+    function setStatus(text, kind){
+      statusText.textContent = text;
+      statusTag.textContent = kind || "IDLE";
+      statusTag.className = "tag" + (kind === "OK" ? " ok" : kind === "ERR" ? " bad" : "");
     }
 
     function clampNonNegativeInt(v){
@@ -356,58 +169,18 @@
       return Math.max(0, Math.floor(n));
     }
 
-    function loadScores(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? safeParseJSON(raw, {}) : {};
-    }
-
-    function saveScores(scores){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
-    }
-
-    // ===== Live URL storage =====
-    function loadLiveUrl(){
-      return localStorage.getItem(LIVE_URL_KEY) || "";
-    }
-    function saveLiveUrl(url){
-      localStorage.setItem(LIVE_URL_KEY, url.trim());
-    }
-    function clearLiveUrl(){
-      localStorage.removeItem(LIVE_URL_KEY);
-    }
-    function isLikelyFacebookUrl(url){
-      const u = (url || "").trim();
-      return u.startsWith("https://www.facebook.com/") || u.startsWith("https://fb.watch/");
-    }
-
-    // ===== Players storage =====
-    function normalizePlayers(text){
-      return (text || "")
-        .split("\n")
-        .map(x => x.trim())
-        .filter(Boolean);
-    }
-
-    function loadPlayers(){
-      const raw = localStorage.getItem(PLAYERS_KEY);
-      return raw ? safeParseJSON(raw, {}) : {};
-    }
-
-    function savePlayers(map){
-      localStorage.setItem(PLAYERS_KEY, JSON.stringify(map));
-    }
-
-    function fillPlayersUI(){
-      const map = loadPlayers();
-      playersA.value = (Array.isArray(map[A]) ? map[A] : []).join("\n");
-      playersR.value = (Array.isArray(map[R]) ? map[R] : []).join("\n");
-      playersM.value = (Array.isArray(map[M]) ? map[M] : []).join("\n");
-      playersG.value = (Array.isArray(map[G]) ? map[G] : []).join("\n");
+    async function loadScoresJson(){
+      // Load from repo file (shared)
+      const res = await fetch(`scores.json?ts=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) return { scores: {} };
+      const data = await res.json();
+      if (!data || typeof data !== "object") return { scores: {} };
+      if (!data.scores || typeof data.scores !== "object") data.scores = {};
+      return data;
     }
 
     function buildUI(scores){
       scheduleEl.innerHTML = "";
-
       for (const g of MATCHES){
         const entry = scores[g.id] || {};
         const hs = Number.isInteger(entry.home) ? entry.home : "";
@@ -459,6 +232,7 @@
         const hs = clampNonNegativeInt(homeEl?.value);
         const as = clampNonNegativeInt(awayEl?.value);
 
+        // Only store if both are provided
         if (hs !== null && as !== null){
           scores[g.id] = { home: hs, away: as };
         }
@@ -466,80 +240,61 @@
       return scores;
     }
 
-    function doSaveScores(){
-      const existing = loadScores();
-      const latest = collectScoresFromUI();
-      const merged = { ...existing, ...latest };
-      saveScores(merged);
-      alert("Saved scores!");
-      buildUI(merged);
+    async function pushScores(scores){
+      const secret = (secretEl.value || "").trim();
+      if (!secret) {
+        throw new Error("Admin Secret is required.");
+      }
+
+      const res = await fetch("/.netlify/functions/updateScores", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Secret": secret
+        },
+        body: JSON.stringify({ scores })
+      });
+
+      if (!res.ok){
+        const txt = await res.text();
+        throw new Error(txt || "Save failed");
+      }
+      return await res.json();
     }
 
-    function doResetScores(){
-      const ok = confirm("Reset ALL saved scores? This clears all matches.");
-      if (!ok) return;
-      localStorage.removeItem(STORAGE_KEY);
-      buildUI({});
+    async function init(){
+      setStatus("Loading existing scores.json…", "IDLE");
+      const data = await loadScoresJson();
+      buildUI(data.scores || {});
+      setStatus("Ready", "IDLE");
     }
 
-    function initLiveUrlUI(){
-      liveUrlInput.value = loadLiveUrl();
+    completeBtn.addEventListener("click", async ()=>{
+      try{
+        setStatus("Saving… committing to GitHub", "IDLE");
+        completeBtn.disabled = true;
 
-      saveLiveBtn.addEventListener("click", ()=>{
-        const url = (liveUrlInput.value || "").trim();
-        if (!url){
-          alert("Paste a Facebook Live video URL first.");
+        const latest = collectScoresFromUI();
+        if (Object.keys(latest).length === 0){
+          setStatus("Nothing to save (enter at least one completed match).", "ERR");
+          completeBtn.disabled = false;
           return;
         }
-        if (!isLikelyFacebookUrl(url)){
-          alert("Please paste a valid Facebook URL (example: https://www.facebook.com/.../videos/123...).");
-          return;
-        }
-        saveLiveUrl(url);
-        alert("Saved Live URL! Viewer page will use this.");
-      });
 
-      clearLiveBtn.addEventListener("click", ()=>{
-        const ok = confirm("Clear the saved Live URL?");
-        if (!ok) return;
-        clearLiveUrl();
-        liveUrlInput.value = "";
-      });
-    }
+        await pushScores(latest);
 
-    function initPlayersUI(){
-      fillPlayersUI();
+        setStatus("Saved! scores.json updated. Viewer will update after deploy.", "OK");
 
-      savePlayersBtn.addEventListener("click", ()=>{
-        const map = {};
-        map[A] = normalizePlayers(playersA.value);
-        map[R] = normalizePlayers(playersR.value);
-        map[M] = normalizePlayers(playersM.value);
-        map[G] = normalizePlayers(playersG.value);
+        // reload file after a short delay (deploy might take a moment, but this confirms the repo content)
+        setTimeout(init, 1200);
+      }catch(e){
+        setStatus("Save failed: " + e.message, "ERR");
+      }finally{
+        completeBtn.disabled = false;
+      }
+    });
 
-        savePlayers(map);
-        alert("Saved players!");
-      });
-
-      clearPlayersBtn.addEventListener("click", ()=>{
-        const ok = confirm("Clear all player lists?");
-        if (!ok) return;
-        localStorage.removeItem(PLAYERS_KEY);
-        playersA.value = "";
-        playersR.value = "";
-        playersM.value = "";
-        playersG.value = "";
-      });
-    }
-
-    // Init
-    initLiveUrlUI();
-    initPlayersUI();
-    const initial = loadScores();
-    buildUI(initial);
-
-    saveBtn.addEventListener("click", doSaveScores);
-    resetBtn.addEventListener("click", doResetScores);
+    init();
   </script>
 </body>
 </html>
