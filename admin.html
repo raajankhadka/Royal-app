@@ -130,7 +130,7 @@
       background: rgba(0,0,0,.15);
     }
     .team{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-    .team .name{ font-weight:700; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .team .name{ font-weight:800; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .team .hint{ font-size:12px; color:var(--muted); }
     .scorebox{ display:flex; align-items:center; gap:8px; justify-content:center; white-space:nowrap; }
     input[type="number"]{
@@ -161,6 +161,42 @@
       font-size:12px;
       line-height:1.45;
     }
+
+    .textinput{
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    .textinput:focus{
+      border-color: rgba(142,160,199,.6);
+      box-shadow: 0 0 0 3px rgba(142,160,199,.18);
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+      line-height:1.4;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .grid2{
+      display:grid;
+      gap:12px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 900px){
+      .grid2{ grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
@@ -169,38 +205,115 @@
     <div class="title">
       <div>
         <h1>Intra Royal Cup <span class="pill">Admin</span></h1>
-        <p class="subtitle">Only Admin updates scores. Scores are saved and shown on Viewer page.</p>
+        <p class="subtitle">Admin updates: Live URL, Players per team, and Scores.</p>
       </div>
       <div class="controls">
         <button id="saveBtn" type="button">Save Scores</button>
-        <button id="resetBtn" class="danger" type="button">Reset All</button>
+        <button id="resetBtn" class="danger" type="button">Reset Scores</button>
         <a class="btn" href="index.html">Viewer</a>
       </div>
     </div>
   </header>
 
   <main>
+    <!-- Live settings -->
+    <section class="card">
+      <h2>
+        Live Stream Settings
+        <span class="pill">Paste FB live link</span>
+      </h2>
+      <div class="schedule">
+        <div class="match">
+          <div class="match-title">
+            <strong>Facebook Live Video URL</strong>
+            <span class="pill">Admin</span>
+          </div>
+
+          <div style="display:grid; gap:10px;">
+            <input
+              id="liveUrlInput"
+              class="textinput"
+              type="text"
+              placeholder="https://www.facebook.com/yourpage/videos/1234567890/"
+            />
+            <div class="row">
+              <button id="saveLiveBtn" type="button">Save Live URL</button>
+              <button id="clearLiveBtn" class="danger" type="button">Clear Live URL</button>
+            </div>
+            <div class="note" style="margin:0;">
+              Go Live on Facebook normally. Copy the live video URL and paste it here.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Players settings -->
+    <section class="card">
+      <h2>
+        Team Players
+        <span class="pill">One name per line</span>
+      </h2>
+      <div class="schedule">
+        <div class="grid2">
+          <div class="match">
+            <div class="match-title"><strong>Arbin(Ma-Kalu)</strong><span class="pill">Players</span></div>
+            <textarea id="playersA" class="textinput" placeholder="Player 1&#10;Player 2&#10;Player 3"></textarea>
+          </div>
+
+          <div class="match">
+            <div class="match-title"><strong>Rooster(Eagle Eye)</strong><span class="pill">Players</span></div>
+            <textarea id="playersR" class="textinput" placeholder="Player 1&#10;Player 2"></textarea>
+          </div>
+
+          <div class="match">
+            <div class="match-title"><strong>Mama(Mama-Vanja)</strong><span class="pill">Players</span></div>
+            <textarea id="playersM" class="textinput"></textarea>
+          </div>
+
+          <div class="match">
+            <div class="match-title"><strong>Ganesh(B-Bites FC)</strong><span class="pill">Players</span></div>
+            <textarea id="playersG" class="textinput"></textarea>
+          </div>
+        </div>
+
+        <div class="row" style="padding:0 2px;">
+          <button id="savePlayersBtn" type="button">Save Players</button>
+          <button id="clearPlayersBtn" class="danger" type="button">Clear Players</button>
+        </div>
+
+        <div class="note" style="margin-top:10px;">
+          Viewer can click a team name (schedule or standings) to see the player list.
+        </div>
+      </div>
+    </section>
+
+    <!-- Score editing -->
     <section class="card">
       <h2>
         Update Scores
-        <span class="pill">Auto-save available</span>
+        <span class="pill">Match 1–6</span>
       </h2>
       <div class="schedule" id="schedule"></div>
       <div class="note">
-        Tip: Enter scores, then click <strong>Save Scores</strong>. Viewer page updates automatically in the same browser.
+        Enter scores, then click <strong>Save Scores</strong>. Viewer updates automatically in the same browser.
       </div>
     </section>
   </main>
 
   <script>
-    // ===== Shared data (same as index.html) =====
+    // ===== Shared storage keys =====
     const STORAGE_KEY = "royalCupScores_v1";
+    const LIVE_URL_KEY = "royalCupLiveUrl_v1";
+    const PLAYERS_KEY = "royalCupPlayers_v1";
 
+    // Teams
     const A = "Arbin(Ma-Kalu)";
     const R = "Rooster(Eagle Eye)";
     const M = "Mama(Mama-Vanja)";
     const G = "Ganesh(B-Bites FC)";
 
+    // Match list
     const MATCHES = [
       { id: "g1", title: "Match 1", home: A, away: R },
       { id: "g2", title: "Match 2", home: M, away: G },
@@ -214,6 +327,28 @@
     const saveBtn = document.getElementById("saveBtn");
     const resetBtn = document.getElementById("resetBtn");
 
+    // Live URL elements
+    const liveUrlInput = document.getElementById("liveUrlInput");
+    const saveLiveBtn = document.getElementById("saveLiveBtn");
+    const clearLiveBtn = document.getElementById("clearLiveBtn");
+
+    // Players elements
+    const playersA = document.getElementById("playersA");
+    const playersR = document.getElementById("playersR");
+    const playersM = document.getElementById("playersM");
+    const playersG = document.getElementById("playersG");
+    const savePlayersBtn = document.getElementById("savePlayersBtn");
+    const clearPlayersBtn = document.getElementById("clearPlayersBtn");
+
+    function safeParseJSON(raw, fallback){
+      try{
+        const v = JSON.parse(raw);
+        return (v && typeof v === "object") ? v : fallback;
+      }catch{
+        return fallback;
+      }
+    }
+
     function clampNonNegativeInt(v){
       if (v === "" || v === null || v === undefined) return null;
       const n = Number(v);
@@ -222,18 +357,52 @@
     }
 
     function loadScores(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return {};
-        const obj = JSON.parse(raw);
-        return (obj && typeof obj === "object") ? obj : {};
-      }catch(e){
-        return {};
-      }
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? safeParseJSON(raw, {}) : {};
     }
 
     function saveScores(scores){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
+    }
+
+    // ===== Live URL storage =====
+    function loadLiveUrl(){
+      return localStorage.getItem(LIVE_URL_KEY) || "";
+    }
+    function saveLiveUrl(url){
+      localStorage.setItem(LIVE_URL_KEY, url.trim());
+    }
+    function clearLiveUrl(){
+      localStorage.removeItem(LIVE_URL_KEY);
+    }
+    function isLikelyFacebookUrl(url){
+      const u = (url || "").trim();
+      return u.startsWith("https://www.facebook.com/") || u.startsWith("https://fb.watch/");
+    }
+
+    // ===== Players storage =====
+    function normalizePlayers(text){
+      return (text || "")
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean);
+    }
+
+    function loadPlayers(){
+      const raw = localStorage.getItem(PLAYERS_KEY);
+      return raw ? safeParseJSON(raw, {}) : {};
+    }
+
+    function savePlayers(map){
+      localStorage.setItem(PLAYERS_KEY, JSON.stringify(map));
+    }
+
+    function fillPlayersUI(){
+      const map = loadPlayers();
+      playersA.value = (Array.isArray(map[A]) ? map[A] : []).join("\n");
+      playersR.value = (Array.isArray(map[R]) ? map[R] : []).join("\n");
+      playersM.value = (Array.isArray(map[M]) ? map[M] : []).join("\n");
+      playersG.value = (Array.isArray(map[G]) ? map[G] : []).join("\n");
     }
 
     function buildUI(scores){
@@ -290,7 +459,6 @@
         const hs = clampNonNegativeInt(homeEl?.value);
         const as = clampNonNegativeInt(awayEl?.value);
 
-        // Only store if both scores entered
         if (hs !== null && as !== null){
           scores[g.id] = { home: hs, away: as };
         }
@@ -298,29 +466,80 @@
       return scores;
     }
 
-    function doSave(){
-      // Merge: keep old scores unless overwritten
+    function doSaveScores(){
       const existing = loadScores();
       const latest = collectScoresFromUI();
       const merged = { ...existing, ...latest };
       saveScores(merged);
-      alert("Saved! Viewer page will show updated scores.");
+      alert("Saved scores!");
       buildUI(merged);
     }
 
-    function doResetAll(){
-      const ok = confirm("Reset ALL saved scores? This will clear all matches.");
+    function doResetScores(){
+      const ok = confirm("Reset ALL saved scores? This clears all matches.");
       if (!ok) return;
       localStorage.removeItem(STORAGE_KEY);
       buildUI({});
     }
 
+    function initLiveUrlUI(){
+      liveUrlInput.value = loadLiveUrl();
+
+      saveLiveBtn.addEventListener("click", ()=>{
+        const url = (liveUrlInput.value || "").trim();
+        if (!url){
+          alert("Paste a Facebook Live video URL first.");
+          return;
+        }
+        if (!isLikelyFacebookUrl(url)){
+          alert("Please paste a valid Facebook URL (example: https://www.facebook.com/.../videos/123...).");
+          return;
+        }
+        saveLiveUrl(url);
+        alert("Saved Live URL! Viewer page will use this.");
+      });
+
+      clearLiveBtn.addEventListener("click", ()=>{
+        const ok = confirm("Clear the saved Live URL?");
+        if (!ok) return;
+        clearLiveUrl();
+        liveUrlInput.value = "";
+      });
+    }
+
+    function initPlayersUI(){
+      fillPlayersUI();
+
+      savePlayersBtn.addEventListener("click", ()=>{
+        const map = {};
+        map[A] = normalizePlayers(playersA.value);
+        map[R] = normalizePlayers(playersR.value);
+        map[M] = normalizePlayers(playersM.value);
+        map[G] = normalizePlayers(playersG.value);
+
+        savePlayers(map);
+        alert("Saved players!");
+      });
+
+      clearPlayersBtn.addEventListener("click", ()=>{
+        const ok = confirm("Clear all player lists?");
+        if (!ok) return;
+        localStorage.removeItem(PLAYERS_KEY);
+        playersA.value = "";
+        playersR.value = "";
+        playersM.value = "";
+        playersG.value = "";
+      });
+    }
+
     // Init
+    initLiveUrlUI();
+    initPlayersUI();
     const initial = loadScores();
     buildUI(initial);
 
-    saveBtn.addEventListener("click", doSave);
-    resetBtn.addEventListener("click", doResetAll);
+    saveBtn.addEventListener("click", doSaveScores);
+    resetBtn.addEventListener("click", doResetScores);
   </script>
 </body>
 </html>
