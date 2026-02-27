@@ -49,7 +49,7 @@
       border-radius:12px;
       cursor:pointer;
       box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      font-weight:600;
+      font-weight:700;
       font-size:13px;
       text-decoration:none;
       display:inline-flex;
@@ -99,20 +99,20 @@
 
     /* Schedule */
     .schedule{ padding:14px 16px 18px; display:grid; gap:12px; }
-    .matchday{
+    .matchcard{
       border:1px solid var(--line);
       border-radius:14px;
       padding:12px;
       background: rgba(255,255,255,.03);
     }
-    .matchday-title{
+    .match-title{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:10px;
       margin-bottom:10px;
     }
-    .matchday-title strong{
+    .match-title strong{
       font-size:13px;
       letter-spacing:.3px;
       text-transform:uppercase;
@@ -137,13 +137,15 @@
       white-space:nowrap;
     }
     .team .hint{ font-size:12px; color:var(--muted); }
-    .team .name a{
+
+    .teamlink{
       color:var(--text);
       text-decoration:none;
       border-bottom:1px dashed rgba(255,255,255,.25);
       padding-bottom:1px;
+      cursor:pointer;
     }
-    .team .name a:hover{ filter:brightness(1.12); }
+    .teamlink:hover{ filter:brightness(1.12); }
 
     .scorebox{
       display:flex;
@@ -151,7 +153,7 @@
       gap:10px;
       justify-content:center;
       white-space:nowrap;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.3px;
     }
     .score{
@@ -182,20 +184,11 @@
       border-bottom:1px solid var(--line);
       font-size:13px;
     }
-    th{ color:var(--muted); font-weight:700; background: rgba(255,255,255,.03); }
+    th{ color:var(--muted); font-weight:800; background: rgba(255,255,255,.03); }
     td:first-child, th:first-child{ text-align:left; }
     tr:last-child td{ border-bottom:none; }
-    .teamcell{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; }
+    .teamcell{ display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px; }
     .dot{ width:10px;height:10px;border-radius:50%; background: rgba(255,255,255,.30); border:1px solid var(--line); flex:0 0 auto; }
-
-    .teamlink{
-      color:var(--text);
-      text-decoration:none;
-      border-bottom:1px dashed rgba(255,255,255,.25);
-      padding-bottom:1px;
-      cursor:pointer;
-    }
-    .teamlink:hover{ filter:brightness(1.12); }
 
     .legend{
       margin-top:10px;
@@ -214,29 +207,6 @@
       background: rgba(0,0,0,.12);
       font-size:12px;
       line-height:1.45;
-    }
-
-    /* Player section */
-    .fbwrap{
-      max-width:1100px;
-      margin:0 auto 30px;
-      padding:0 18px 30px;
-    }
-    .player{ padding:14px 16px 18px; }
-    .player-frame{
-      border:1px solid var(--line);
-      border-radius:14px;
-      overflow:hidden;
-      background: rgba(0,0,0,.18);
-    }
-    .player-frame iframe{
-      width:100%;
-      height:520px;
-      border:0;
-      display:block;
-    }
-    @media (max-width: 700px){
-      .player-frame iframe{ height:320px; }
     }
 
     /* Modal */
@@ -274,11 +244,9 @@
       padding:8px 10px;
       border-radius:12px;
       cursor:pointer;
-      font-weight:800;
+      font-weight:900;
     }
-    .modal-body{
-      padding:14px 16px 16px;
-    }
+    .modal-body{ padding:14px 16px 16px; }
     .players{
       list-style:none;
       padding:0;
@@ -291,13 +259,9 @@
       border-radius:12px;
       border:1px solid var(--line);
       background: rgba(0,0,0,.12);
-      font-weight:700;
+      font-weight:800;
     }
-    .muted{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.45;
-    }
+    .muted{ color:var(--muted); font-size:13px; line-height:1.45; }
   </style>
 </head>
 
@@ -306,7 +270,7 @@
     <div class="title">
       <div>
         <h1>Intra Royal Cup <span class="pill">Viewer</span></h1>
-        <p class="subtitle">Scores and Live video are updated by Admin. Click a team to see players.</p>
+        <p class="subtitle">Scores load from <code>scores.json</code>. Click a team to see players (TXT files).</p>
       </div>
       <div class="controls">
         <button id="refreshBtn" type="button">Refresh</button>
@@ -316,37 +280,21 @@
   </header>
 
   <main>
-    <!-- Schedule -->
     <section class="card">
-      <h2>
-        Schedule
-        <span class="pill">Match list</span>
-      </h2>
+      <h2>Schedule <span class="pill">Match list</span></h2>
       <div class="schedule" id="schedule"></div>
       <div class="note" style="margin:0 16px 16px;">
-        If you don’t see updates, click <strong>Refresh</strong>.
+        If scores don’t update right away after admin saves, wait for Netlify deploy then click <strong>Refresh</strong>.
       </div>
     </section>
 
-    <!-- Standings -->
     <aside class="card">
-      <h2>
-        Standings
-        <span class="pill">Win=3 • Draw=1 • Loss=0</span>
-      </h2>
+      <h2>Standings <span class="pill">Win=3 • Draw=1 • Loss=0</span></h2>
       <div class="standings">
         <table>
           <thead>
             <tr>
-              <th>Team</th>
-              <th>P</th>
-              <th>W</th>
-              <th>D</th>
-              <th>L</th>
-              <th>GF</th>
-              <th>GA</th>
-              <th>GD</th>
-              <th>Pts</th>
+              <th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -359,36 +307,6 @@
       </div>
     </aside>
   </main>
-
-  <!-- Facebook Live Player (autoplay + muted) -->
-  <div class="fbwrap">
-    <section class="card">
-      <h2>
-        Live Stream
-        <span class="pill">Facebook Live</span>
-      </h2>
-      <div class="player">
-        <div class="player-frame">
-          <iframe
-            id="fbPlayer"
-            src=""
-            scrolling="no"
-            frameborder="0"
-            allowfullscreen="true"
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-          </iframe>
-        </div>
-
-        <div id="noLiveMsg" class="note" style="margin-top:12px; display:none;">
-          No live video set yet. Admin must paste the Facebook Live link in admin page.
-        </div>
-
-        <div class="note" style="margin-top:12px;">
-          Autoplay works only when muted (browser restriction).
-        </div>
-      </div>
-    </section>
-  </div>
 
   <!-- Team modal -->
   <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
@@ -404,11 +322,6 @@
   </div>
 
   <script>
-    // ===== Shared storage keys =====
-    const STORAGE_KEY = "royalCupScores_v1";
-    const LIVE_URL_KEY = "royalCupLiveUrl_v1";
-    const PLAYERS_KEY = "royalCupPlayers_v1";
-
     // Teams
     const A = "Arbin(Ma-Kalu)";
     const R = "Rooster(Eagle Eye)";
@@ -417,7 +330,15 @@
 
     const TEAMS = [A, R, M, G];
 
-    // Match list (Match 1..6)
+    // Team -> TXT file mapping (same folder as index.html)
+    const TEAM_FILES = {
+      [A]: "players-arbin.txt",
+      [R]: "players-rooster.txt",
+      [M]: "players-mama.txt",
+      [G]: "players-ganesh.txt"
+    };
+
+    // Match list
     const MATCHES = [
       { id: "g1", title: "Match 1", home: A, away: R },
       { id: "g2", title: "Match 2", home: M, away: G },
@@ -437,23 +358,23 @@
     const modalTitle = document.getElementById("modalTitle");
     const modalContent = document.getElementById("modalContent");
 
-    function safeParseJSON(raw, fallback){
-      try{
-        const v = JSON.parse(raw);
-        return (v && typeof v === "object") ? v : fallback;
-      }catch{
-        return fallback;
-      }
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
 
-    function loadScores(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? safeParseJSON(raw, {}) : {};
-    }
-
-    function loadPlayers(){
-      const raw = localStorage.getItem(PLAYERS_KEY);
-      return raw ? safeParseJSON(raw, {}) : {};
+    async function loadScores(){
+      // Shared file in repo
+      const res = await fetch(`scores.json?ts=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) return {};
+      const data = await res.json();
+      if (!data || typeof data !== "object") return {};
+      if (!data.scores || typeof data.scores !== "object") return {};
+      return data.scores;
     }
 
     function emptyStats(){
@@ -494,22 +415,11 @@
       for (const t of TEAMS){
         stats[t].GD = stats[t].GF - stats[t].GA;
       }
-
       return stats;
     }
 
     function makeTeamLink(team){
-      // Use a link-style span so it can be clicked anywhere
       return `<a class="teamlink" href="#" data-team="${escapeHtml(team)}">${escapeHtml(team)}</a>`;
-    }
-
-    function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
     }
 
     function renderTable(stats){
@@ -523,20 +433,9 @@
         const s = stats[team];
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>
-            <div class="teamcell">
-              <span class="dot"></span>
-              ${makeTeamLink(team)}
-            </div>
-          </td>
-          <td>${s.P}</td>
-          <td>${s.W}</td>
-          <td>${s.D}</td>
-          <td>${s.L}</td>
-          <td>${s.GF}</td>
-          <td>${s.GA}</td>
-          <td>${s.GD}</td>
-          <td><strong>${s.Pts}</strong></td>
+          <td><div class="teamcell"><span class="dot"></span>${makeTeamLink(team)}</div></td>
+          <td>${s.P}</td><td>${s.W}</td><td>${s.D}</td><td>${s.L}</td>
+          <td>${s.GF}</td><td>${s.GA}</td><td>${s.GD}</td><td><strong>${s.Pts}</strong></td>
         `;
         tableBodyEl.appendChild(tr);
       }
@@ -550,9 +449,9 @@
         const as = Number.isInteger(entry.away) ? entry.away : "";
 
         const wrap = document.createElement("div");
-        wrap.className = "matchday";
+        wrap.className = "matchcard";
         wrap.innerHTML = `
-          <div class="matchday-title">
+          <div class="match-title">
             <strong>${escapeHtml(g.title)}</strong>
             <span class="pill">${hs === "" || as === "" ? "Not played" : "Played"}</span>
           </div>
@@ -579,72 +478,48 @@
       }
     }
 
-    // ===== Live URL handling =====
-    function loadLiveUrl(){
-      return localStorage.getItem(LIVE_URL_KEY) || "";
-    }
+    async function openTeamModal(team){
+      modalTitle.textContent = team;
 
-    function buildFacebookEmbedSrc(fbUrl){
-      const href = encodeURIComponent(fbUrl.trim());
-      return `https://www.facebook.com/plugins/video.php?href=${href}&autoplay=1&mute=1&show_text=0`;
-    }
-
-    function renderLivePlayer(){
-      const fbUrl = loadLiveUrl();
-      const iframe = document.getElementById("fbPlayer");
-      const msg = document.getElementById("noLiveMsg");
-
-      if (!fbUrl){
-        iframe.style.display = "none";
-        msg.style.display = "block";
+      const file = TEAM_FILES[team];
+      if (!file){
+        modalContent.innerHTML = `<div class="muted">No file mapped for this team.</div>`;
+        showModal();
         return;
       }
 
-      iframe.style.display = "block";
-      msg.style.display = "none";
-      iframe.src = buildFacebookEmbedSrc(fbUrl);
-    }
+      try{
+        const res = await fetch(`${file}?ts=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`Could not load ${file}`);
 
-    // ===== Players modal =====
-    function openTeamModal(team){
-      const playersMap = loadPlayers();
-      const players = Array.isArray(playersMap[team]) ? playersMap[team] : [];
+        const text = await res.text();
+        const players = text.split("\n").map(x=>x.trim()).filter(Boolean);
 
-      modalTitle.textContent = team;
-
-      if (players.length === 0){
-        modalContent.innerHTML = `
-          <div class="muted">
-            No players added for this team yet.
-            <br/>Admin can add player names in <strong>admin.html</strong>.
-          </div>
-        `;
-      } else {
-        modalContent.innerHTML = `
-          <ul class="players">
-            ${players.map(p => `<li>${escapeHtml(p)}</li>`).join("")}
-          </ul>
-        `;
+        if (!players.length){
+          modalContent.innerHTML = `<div class="muted">No players listed in <strong>${escapeHtml(file)}</strong> yet.</div>`;
+        } else {
+          modalContent.innerHTML = `<ul class="players">${players.map(p=>`<li>${escapeHtml(p)}</li>`).join("")}</ul>`;
+        }
+      }catch(err){
+        modalContent.innerHTML = `<div class="muted">Failed to load players.<br><strong>${escapeHtml(String(err))}</strong></div>`;
       }
 
-      modalBackdrop.style.display = "flex";
-      modalBackdrop.setAttribute("aria-hidden", "false");
+      showModal();
     }
 
+    function showModal(){
+      modalBackdrop.style.display = "flex";
+      modalBackdrop.setAttribute("aria-hidden","false");
+    }
     function closeModal(){
       modalBackdrop.style.display = "none";
-      modalBackdrop.setAttribute("aria-hidden", "true");
+      modalBackdrop.setAttribute("aria-hidden","true");
     }
 
     modalClose.addEventListener("click", closeModal);
-    modalBackdrop.addEventListener("click", (e)=>{
-      if (e.target === modalBackdrop) closeModal();
-    });
-    window.addEventListener("keydown", (e)=>{
-      if (e.key === "Escape") closeModal();
-    });
+    modalBackdrop.addEventListener("click", (e)=>{ if (e.target === modalBackdrop) closeModal(); });
+    window.addEventListener("keydown", (e)=>{ if (e.key === "Escape") closeModal(); });
 
-    // click handler (event delegation)
     document.addEventListener("click", (e)=>{
       const link = e.target.closest("[data-team]");
       if (!link) return;
@@ -653,22 +528,17 @@
       if (team) openTeamModal(team);
     });
 
-    function refreshAll(){
-      const scores = loadScores();
-      renderSchedule(scores);
-      const stats = computeStandings(scores);
-      renderTable(stats);
-      renderLivePlayer();
+    async function refreshAll(){
+      try{
+        const scores = await loadScores();
+        renderSchedule(scores);
+        renderTable(computeStandings(scores));
+      }catch(e){
+        alert("Could not load scores.json.\n" + e.message);
+      }
     }
 
-    // Listen for updates from admin (same browser)
-    window.addEventListener("storage", (e)=>{
-      if (e.key === STORAGE_KEY || e.key === LIVE_URL_KEY || e.key === PLAYERS_KEY) refreshAll();
-    });
-
     refreshBtn.addEventListener("click", refreshAll);
-
-    // Initial render
     refreshAll();
   </script>
 </body>
