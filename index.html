@@ -11,9 +11,6 @@
       --muted:#8ea0c7;
       --text:#e8eeff;
       --line:rgba(255,255,255,.10);
-      --good:#44d07b;
-      --warn:#ffcc66;
-      --bad:#ff6b6b;
       --btn:#2b3b74;
       --btn2:#1d2a55;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
@@ -71,6 +68,7 @@
     }
     button:hover{ filter:brightness(1.08); }
     button:active{ transform: translateY(1px); }
+
     main{
       max-width:1100px;
       margin:0 auto;
@@ -265,11 +263,12 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="title">
       <div>
-        <h1>4-Team League <span class="badge">6 Games</span></h1>
+        <h1>Intra Royal Cup <span class="badge">6 Games</span></h1>
         <p class="subtitle">Enter scores to auto-update standings (W/D/L, GF/GA/GD, Points).</p>
       </div>
       <div class="controls">
@@ -315,39 +314,41 @@
 
         <div class="legend">
           <div><strong>GF</strong>=Goals For, <strong>GA</strong>=Goals Against, <strong>GD</strong>=Goal Diff</div>
-          <div class="note">
-            Tip: leaving a score blank means the game is not played yet.
-          </div>
+          <div class="note">Tip: leaving a score blank means the game is not played yet.</div>
         </div>
       </div>
     </aside>
   </main>
 
   <script>
-    // Teams
-    const TEAMS = ["Arbin(Ma-Kalu)", "Rooster(Eagle Eye)", "Mama(Mama-Vanja)", "Ganesh(B-Bites FC)"];
+    // Use constants so the names match everywhere (TEAMS and MATCHDAYS)
+    const A = "Arbin(Ma-Kalu)";
+    const R = "Rooster(Eagle Eye)";
+    const M = "Mama(Mama-Vanja)";
+    const G = "Ganesh(B-Bites FC)";
 
-    // 6-game schedule (3 matchdays, 2 games each)
+    const TEAMS = [A, R, M, G];
+
     const MATCHDAYS = [
       {
         title: "Matchday 1",
         games: [
-          { id: "g1", home: "Arbin(Ma-Kalu)",   away: "Rooster(Eagle Eye)" },
-          { id: "g2", home: "Mama(Mama-Vanja)",    away: "Ganesh(B-Bites FC)"  }
+          { id: "g1", home: A, away: R },
+          { id: "g2", home: M, away: G }
         ]
       },
       {
         title: "Matchday 2",
         games: [
-          { id: "g3", home: "Arbin",   away: "Mama"    },
-          { id: "g4", home: "Rooster", away: "Ganesh"  }
+          { id: "g3", home: A, away: M },
+          { id: "g4", home: R, away: G }
         ]
       },
       {
         title: "Matchday 3",
         games: [
-          { id: "g5", home: "Arbin",   away: "Ganesh"  },
-          { id: "g6", home: "Rooster", away: "Mama"    }
+          { id: "g5", home: A, away: G },
+          { id: "g6", home: R, away: M }
         ]
       }
     ];
@@ -357,7 +358,6 @@
     const resetBtn = document.getElementById("resetBtn");
     const demoBtn = document.getElementById("demoBtn");
 
-    // Helpers
     function clampNonNegativeInt(v){
       if (v === "" || v === null || v === undefined) return null;
       const n = Number(v);
@@ -382,7 +382,6 @@
           const hs = clampNonNegativeInt(document.querySelector(`[data-game="${game.id}"][data-side="home"]`)?.value);
           const as = clampNonNegativeInt(document.querySelector(`[data-game="${game.id}"][data-side="away"]`)?.value);
 
-          // Game not played yet if either is blank
           if (hs === null || as === null) continue;
 
           stats[h].P++; stats[a].P++;
@@ -402,12 +401,10 @@
         }
       }
 
-      // GD
       for (const t of TEAMS){
         stats[t].GD = stats[t].GF - stats[t].GA;
       }
 
-      // Sort: Points desc, GD desc, GF desc, Team name asc
       const sorted = [...TEAMS].sort((x,y)=>{
         const A = stats[x], B = stats[y];
         return (B.Pts - A.Pts) || (B.GD - A.GD) || (B.GF - A.GF) || x.localeCompare(y);
@@ -482,10 +479,8 @@
         scheduleEl.appendChild(wrap);
       }
 
-      // Bind events
       scheduleEl.querySelectorAll('input[type="number"]').forEach(inp=>{
         inp.addEventListener("input", ()=>{
-          // Clean value to non-negative int, allow blank
           if (inp.value === "") return computeStandings();
           const n = clampNonNegativeInt(inp.value);
           inp.value = (n === null ? "" : String(n));
@@ -500,7 +495,6 @@
     }
 
     function randomDemoScores(){
-      // Fill all games with 0-5 random scores
       for (const md of MATCHDAYS){
         for (const g of md.games){
           const hs = Math.floor(Math.random()*6);
@@ -512,7 +506,6 @@
       computeStandings();
     }
 
-    // Init
     buildScheduleUI();
     computeStandings();
 
