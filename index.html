@@ -49,7 +49,7 @@
       border-radius:12px;
       cursor:pointer;
       box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      font-weight:700;
+      font-weight:800;
       font-size:13px;
       text-decoration:none;
       display:inline-flex;
@@ -130,7 +130,7 @@
     }
     .team{ display:flex; flex-direction:column; gap:2px; min-width:0; }
     .team .name{
-      font-weight:800;
+      font-weight:900;
       font-size:14px;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -184,7 +184,7 @@
       border-bottom:1px solid var(--line);
       font-size:13px;
     }
-    th{ color:var(--muted); font-weight:800; background: rgba(255,255,255,.03); }
+    th{ color:var(--muted); font-weight:900; background: rgba(255,255,255,.03); }
     td:first-child, th:first-child{ text-align:left; }
     tr:last-child td{ border-bottom:none; }
     .teamcell{ display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px; }
@@ -259,9 +259,10 @@
       border-radius:12px;
       border:1px solid var(--line);
       background: rgba(0,0,0,.12);
-      font-weight:800;
+      font-weight:900;
     }
     .muted{ color:var(--muted); font-size:13px; line-height:1.45; }
+    code{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 </head>
 
@@ -270,7 +271,7 @@
     <div class="title">
       <div>
         <h1>Intra Royal Cup <span class="pill">Viewer</span></h1>
-        
+        <p class="subtitle">Live scores from Firestore. Click a team name to see players (TXT files).</p>
       </div>
       <div class="controls">
         <button id="refreshBtn" type="button">Refresh</button>
@@ -284,7 +285,7 @@
       <h2>Schedule <span class="pill">Match list</span></h2>
       <div class="schedule" id="schedule"></div>
       <div class="note" style="margin:0 16px 16px;">
-        If scores don’t update right away after admin saves, wait for Netlify deploy then click <strong>Refresh</strong>.
+        This page updates automatically when admin saves. If needed, click <strong>Refresh</strong>.
       </div>
     </section>
 
@@ -321,8 +322,28 @@
     </div>
   </div>
 
-  <script>
-    // Teams
+  <!-- Firebase (Firestore) Viewer -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getFirestore, doc, getDoc, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // ===== Firebase config (your project) =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEmWpbrTa0n3rHnq7q_mJ4Yw3-o56nTkQ",
+      authDomain: "royal-intracup.firebaseapp.com",
+      projectId: "royal-intracup",
+      storageBucket: "royal-intracup.firebasestorage.app",
+      messagingSenderId: "584969743254",
+      appId: "1:584969743254:web:5e2e3d31b652037a660bb7",
+      measurementId: "G-7TG163FWXG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ===== Teams + files =====
     const A = "Arbin(Ma-Kalu)";
     const R = "Rooster(Eagle Eye)";
     const M = "Mama(Mama-Vanja)";
@@ -330,7 +351,6 @@
 
     const TEAMS = [A, R, M, G];
 
-    // Team -> TXT file mapping (same folder as index.html)
     const TEAM_FILES = {
       [A]: "players-arbin.txt",
       [R]: "players-rooster.txt",
@@ -338,7 +358,6 @@
       [G]: "players-ganesh.txt"
     };
 
-    // Match list
     const MATCHES = [
       { id: "g1", title: "Match 1", home: A, away: R },
       { id: "g2", title: "Match 2", home: M, away: G },
@@ -358,6 +377,8 @@
     const modalTitle = document.getElementById("modalTitle");
     const modalContent = document.getElementById("modalContent");
 
+    const stateRef = doc(db, "royalCup", "state");
+
     function escapeHtml(s){
       return String(s)
         .replaceAll("&","&amp;")
@@ -365,16 +386,6 @@
         .replaceAll(">","&gt;")
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
-    }
-
-    async function loadScores(){
-      // Shared file in repo
-      const res = await fetch(`scores.json?ts=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) return {};
-      const data = await res.json();
-      if (!data || typeof data !== "object") return {};
-      if (!data.scores || typeof data.scores !== "object") return {};
-      return data.scores;
     }
 
     function emptyStats(){
@@ -390,7 +401,7 @@
 
       for (const game of MATCHES){
         const h = game.home, a = game.away;
-        const entry = scores[game.id] || {};
+        const entry = scores?.[game.id] || {};
         const hs = Number.isInteger(entry.home) ? entry.home : null;
         const as = Number.isInteger(entry.away) ? entry.away : null;
 
@@ -415,6 +426,7 @@
       for (const t of TEAMS){
         stats[t].GD = stats[t].GF - stats[t].GA;
       }
+
       return stats;
     }
 
@@ -444,7 +456,7 @@
     function renderSchedule(scores){
       scheduleEl.innerHTML = "";
       for (const g of MATCHES){
-        const entry = scores[g.id] || {};
+        const entry = scores?.[g.id] || {};
         const hs = Number.isInteger(entry.home) ? entry.home : "";
         const as = Number.isInteger(entry.away) ? entry.away : "";
 
@@ -528,18 +540,32 @@
       if (team) openTeamModal(team);
     });
 
-    async function refreshAll(){
-      try{
-        const scores = await loadScores();
-        renderSchedule(scores);
-        renderTable(computeStandings(scores));
-      }catch(e){
-        alert("Could not load scores.json.\n" + e.message);
-      }
+    function applyScores(scores){
+      renderSchedule(scores);
+      renderTable(computeStandings(scores));
     }
 
-    refreshBtn.addEventListener("click", refreshAll);
-    refreshAll();
+    async function refreshOnce(){
+      const snap = await getDoc(stateRef);
+      if (!snap.exists()) return applyScores({});
+      const data = snap.data() || {};
+      const scores = (data.scores && typeof data.scores === "object") ? data.scores : {};
+      applyScores(scores);
+    }
+
+    // Realtime updates
+    onSnapshot(stateRef, (snap)=>{
+      if (!snap.exists()) return applyScores({});
+      const data = snap.data() || {};
+      const scores = (data.scores && typeof data.scores === "object") ? data.scores : {};
+      applyScores(scores);
+    });
+
+    refreshBtn.addEventListener("click", refreshOnce);
+
+    // Initial render
+    applyScores({});
+    refreshOnce();
   </script>
 </body>
 </html>
