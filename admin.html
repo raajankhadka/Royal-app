@@ -30,11 +30,15 @@
       color:var(--text);
       padding:10px 12px; border-radius:12px; cursor:pointer;
       box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      font-weight:700; font-size:13px; text-decoration:none;
+      font-weight:800; font-size:13px; text-decoration:none;
       display:inline-flex; align-items:center; gap:8px;
     }
     button:hover, a.btn:hover{ filter:brightness(1.08); }
     button:active, a.btn:active{ transform: translateY(1px); }
+    button.danger{
+      background: linear-gradient(180deg, #c14c4c 0%, var(--danger) 100%);
+    }
+
     main{ max-width:1100px; margin:0 auto; padding:12px 18px 30px; display:grid; gap:14px; }
     .card{
       background:rgba(18,26,51,.85); border:1px solid var(--line);
@@ -50,25 +54,36 @@
       padding:6px 10px; border-radius:999px; background: rgba(255,255,255,.03);
       white-space:nowrap;
     }
-    .schedule{ padding:14px 16px 18px; display:grid; gap:12px; }
+
+    .grid{
+      padding:14px 16px 18px;
+      display:grid;
+      gap:12px;
+    }
+
     .match{
       border:1px solid var(--line); border-radius:14px; padding:12px;
       background: rgba(255,255,255,.03);
     }
-    .match-title{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
-    .match-title strong{ font-size:13px; letter-spacing:.3px; text-transform:uppercase; color:#dbe4ff; }
+    .match-title{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px; margin-bottom:10px;
+    }
+    .match-title strong{
+      font-size:13px; letter-spacing:.3px; text-transform:uppercase; color:#dbe4ff;
+    }
     .game{
       display:grid; grid-template-columns: 1fr auto 1fr; gap:10px; align-items:center;
       padding:10px; border-radius:12px; border:1px solid var(--line); background: rgba(0,0,0,.15);
     }
     .team{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-    .team .name{ font-weight:800; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .team .name{ font-weight:900; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .team .hint{ font-size:12px; color:var(--muted); }
     .scorebox{ display:flex; align-items:center; gap:8px; justify-content:center; white-space:nowrap; }
     input[type="number"], input[type="password"]{
       padding:10px 10px; border-radius:12px; border:1px solid var(--line);
       background: rgba(255,255,255,.04); color:var(--text);
-      font-weight:800; font-size:14px; outline:none;
+      font-weight:900; font-size:14px; outline:none;
     }
     input[type="number"]{ width:64px; text-align:center; }
     input:focus{ border-color: rgba(142,160,199,.6); box-shadow: 0 0 0 3px rgba(142,160,199,.18); }
@@ -85,9 +100,10 @@
       font-size:13px; color:var(--muted);
       display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
-    .tag{ padding:2px 8px; border-radius:999px; border:1px solid var(--line); background: rgba(255,255,255,.03); color:var(--text); font-weight:800; font-size:11px; }
+    .tag{ padding:2px 8px; border-radius:999px; border:1px solid var(--line); background: rgba(255,255,255,.03); color:var(--text); font-weight:900; font-size:11px; }
     .tag.ok{ background: rgba(42,122,75,.18); border-color: rgba(42,122,75,.35); }
     .tag.bad{ background: rgba(164,58,58,.18); border-color: rgba(164,58,58,.35); }
+    code{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 </head>
 
@@ -96,10 +112,11 @@
     <div class="title">
       <div>
         <h1>Intra Royal Cup <span class="pill">Admin</span></h1>
-        <p class="subtitle">Enter scores and click <strong>Complete</strong>. This auto-updates <code>scores.json</code> in GitHub.</p>
+        <p class="subtitle">Enter scores and click <strong>Save</strong>. Viewer updates for everyone (Firestore).</p>
       </div>
       <div class="controls">
-        <button id="completeBtn" type="button">Complete / Save</button>
+        <button id="saveBtn" type="button">Save Scores</button>
+        <button id="resetBtn" class="danger" type="button">Reset All</button>
         <a class="btn" href="index.html">Viewer</a>
       </div>
     </div>
@@ -107,34 +124,56 @@
 
   <main>
     <section class="card">
-      <h2>Admin Secret <span class="pill">Required</span></h2>
-      <div class="schedule">
+      <h2>Admin Code <span class="pill">No login</span></h2>
+      <div class="grid">
         <div class="match">
           <div class="match-title">
-            <strong>Enter Admin Secret</strong>
-            <span class="pill">Matches Netlify env var</span>
+            <strong>Enter Admin Code</strong>
+            <span class="pill">Matches Firestore rules</span>
           </div>
-          <input id="secret" type="password" placeholder="Admin secret (e.g., royal123)" />
+          <input id="adminCode" type="password" placeholder="Admin code (example: royal123)" />
         </div>
       </div>
-      <div class="note">This prevents random visitors from committing to your repo.</div>
+      <div class="note">
+        This project uses a simple admin code (not full auth). Anyone can view, only admin code can write.
+      </div>
     </section>
 
     <section class="card">
       <h2>Update Scores <span class="pill">Match 1–6</span></h2>
-      <div class="schedule" id="schedule"></div>
-      <div class="status" id="statusBar">
-        <div>Status: <span id="statusText">Ready</span></div>
+      <div class="grid" id="schedule"></div>
+      <div class="status">
+        <div>Status: <span id="statusText">Loading…</span></div>
         <div><span class="tag" id="statusTag">IDLE</span></div>
       </div>
       <div class="note">
-        Tip: Enter scores for any matches that are finished. Click <strong>Complete / Save</strong>.
-        The function merges with existing <code>scores.json</code> so older results stay.
+        Tip: Fill both scores for a match to count it as played. Leave blank if not played.
       </div>
     </section>
   </main>
 
-  <script>
+  <!-- Firebase (Firestore) -->
+  <script type="module">
+    // ===== Firebase config (your project) =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEmWpbrTa0n3rHnq7q_mJ4Yw3-o56nTkQ",
+      authDomain: "royal-intracup.firebaseapp.com",
+      projectId: "royal-intracup",
+      storageBucket: "royal-intracup.firebasestorage.app",
+      messagingSenderId: "584969743254",
+      appId: "1:584969743254:web:5e2e3d31b652037a660bb7",
+      measurementId: "G-7TG163FWXG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ===== Shared data =====
     const A = "Arbin(Ma-Kalu)";
     const R = "Rooster(Eagle Eye)";
     const M = "Mama(Mama-Vanja)";
@@ -149,10 +188,14 @@
       { id: "g6", title: "Match 6", home: R, away: M }
     ];
 
-    const scheduleEl = document.getElementById("schedule");
-    const completeBtn = document.getElementById("completeBtn");
-    const secretEl = document.getElementById("secret");
+    // Firestore document where we store scores
+    const stateRef = doc(db, "royalCup", "state");
 
+    // ===== UI =====
+    const scheduleEl = document.getElementById("schedule");
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const adminCodeEl = document.getElementById("adminCode");
     const statusText = document.getElementById("statusText");
     const statusTag = document.getElementById("statusTag");
 
@@ -169,20 +212,10 @@
       return Math.max(0, Math.floor(n));
     }
 
-    async function loadScoresJson(){
-      // Load from repo file (shared)
-      const res = await fetch(`scores.json?ts=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) return { scores: {} };
-      const data = await res.json();
-      if (!data || typeof data !== "object") return { scores: {} };
-      if (!data.scores || typeof data.scores !== "object") data.scores = {};
-      return data;
-    }
-
     function buildUI(scores){
       scheduleEl.innerHTML = "";
       for (const g of MATCHES){
-        const entry = scores[g.id] || {};
+        const entry = scores?.[g.id] || {};
         const hs = Number.isInteger(entry.home) ? entry.home : "";
         const as = Number.isInteger(entry.away) ? entry.away : "";
 
@@ -232,7 +265,7 @@
         const hs = clampNonNegativeInt(homeEl?.value);
         const as = clampNonNegativeInt(awayEl?.value);
 
-        // Only store if both are provided
+        // Only store match if both sides exist
         if (hs !== null && as !== null){
           scores[g.id] = { home: hs, away: as };
         }
@@ -240,61 +273,90 @@
       return scores;
     }
 
-    async function pushScores(scores){
-      const secret = (secretEl.value || "").trim();
-      if (!secret) {
-        throw new Error("Admin Secret is required.");
-      }
-
-      const res = await fetch("/.netlify/functions/updateScores", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Admin-Secret": secret
-        },
-        body: JSON.stringify({ scores })
-      });
-
-      if (!res.ok){
-        const txt = await res.text();
-        throw new Error(txt || "Save failed");
-      }
-      return await res.json();
+    async function loadState(){
+      const snap = await getDoc(stateRef);
+      if (!snap.exists()) return { scores: {} };
+      const data = snap.data();
+      return {
+        scores: (data && typeof data.scores === "object" && data.scores) ? data.scores : {}
+      };
     }
 
-    async function init(){
-      setStatus("Loading existing scores.json…", "IDLE");
-      const data = await loadScoresJson();
-      buildUI(data.scores || {});
-      setStatus("Ready", "IDLE");
+    async function saveState(mergedScores){
+      const adminCode = (adminCodeEl.value || "").trim();
+      if (!adminCode) throw new Error("Admin code is required.");
+
+      // We include adminCode so rules can check it; viewer ignores it.
+      await setDoc(stateRef, {
+        adminCode,
+        scores: mergedScores,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
     }
 
-    completeBtn.addEventListener("click", async ()=>{
+    async function doSave(){
+      setStatus("Saving to Firestore…", "IDLE");
+      saveBtn.disabled = true;
+
       try{
-        setStatus("Saving… committing to GitHub", "IDLE");
-        completeBtn.disabled = true;
-
+        // Merge UI scores with existing scores, so old games stay
+        const current = await loadState();
         const latest = collectScoresFromUI();
+        const merged = { ...(current.scores || {}), ...latest };
+
         if (Object.keys(latest).length === 0){
-          setStatus("Nothing to save (enter at least one completed match).", "ERR");
-          completeBtn.disabled = false;
+          setStatus("Nothing to save (enter at least one finished match).", "ERR");
           return;
         }
 
-        await pushScores(latest);
+        await saveState(merged);
 
-        setStatus("Saved! scores.json updated. Viewer will update after deploy.", "OK");
-
-        // reload file after a short delay (deploy might take a moment, but this confirms the repo content)
-        setTimeout(init, 1200);
+        setStatus("Saved! Viewer will update instantly.", "OK");
+        buildUI(merged);
       }catch(e){
-        setStatus("Save failed: " + e.message, "ERR");
+        setStatus("Save failed: " + (e?.message || String(e)), "ERR");
       }finally{
-        completeBtn.disabled = false;
+        saveBtn.disabled = false;
       }
-    });
+    }
 
-    init();
+    async function doReset(){
+      const ok = confirm("Reset ALL scores for everyone?");
+      if (!ok) return;
+
+      setStatus("Resetting…", "IDLE");
+      resetBtn.disabled = true;
+
+      try{
+        const adminCode = (adminCodeEl.value || "").trim();
+        if (!adminCode) throw new Error("Admin code is required.");
+
+        await setDoc(stateRef, {
+          adminCode,
+          scores: {},
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        setStatus("All scores reset.", "OK");
+        buildUI({});
+      }catch(e){
+        setStatus("Reset failed: " + (e?.message || String(e)), "ERR");
+      }finally{
+        resetBtn.disabled = false;
+      }
+    }
+
+    saveBtn.addEventListener("click", doSave);
+    resetBtn.addEventListener("click", doReset);
+
+    // Init
+    try{
+      const state = await loadState();
+      buildUI(state.scores || {});
+      setStatus("Ready", "IDLE");
+    }catch(e){
+      setStatus("Load failed: " + (e?.message || String(e)), "ERR");
+    }
   </script>
 </body>
 </html>
